@@ -1,0 +1,89 @@
+/* .card-container {
+    height: 18rem !important;
+    border-radius: 20px !important;
+    position: relative;
+} */
+
+/* .card-container {
+    border-radius: 20px !important;
+    position: relative;
+
+}
+
+.card-img {
+    border-radius: 20px 0px 0px 20px !important;
+   
+    max-width: 100%; 
+} */
+.card-container{
+    font-size: .9vw;
+}
+.card{
+    padding: 0px !important;
+}
+.badge {
+    padding: 8px !important;
+}
+
+.my-card-img {
+    border-radius: 20px 0px 0px 20px !important;
+}
+
+.div-badges {
+    position: absolute;
+    top: .5rem;
+    left: 1rem;
+    display: flex;
+    flex-direction: column;
+    font-weight: bolder !important;
+}
+
+.tour-header,
+.price {
+    color: blueviolet;
+}
+
+.book-mark {
+    color: gold;
+    position: absolute;
+    top: -4%;
+    right: 3.5% !important;
+    width: 7%;
+    height: 30%;
+}
+
+.booking-div-details {
+    position: absolute;
+    bottom: 2%;
+    right: 2%;
+}
+
+.select-tour {
+    border: none !important;
+    color: white;
+}
+
+.select-tour,
+.badge {
+    background-color: blueviolet !important;
+}
+
+@media (max-width: 576px) {
+    .card-container{
+        font-size: 3vw;
+    }
+    .book-mark {
+        top: -10.5%;
+    }
+
+    .booking-div-details {
+
+        text-align: end;
+    }
+
+    .tour-header {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}

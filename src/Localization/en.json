@@ -1,0 +1,203 @@
+{
+  "home": {
+    "title": "Make A New Adventure With",
+    "description": "Trollii helps you plan your trip easily. Now by just a few clicks, you can travel the world, book a hotel, and enjoy your traveling experience. It's time to fasten your seat belt!",
+    "popular_destinations": "Popular Destinations",
+    "subscribe": "Subscribe",
+    "trollii_newsletter": "Trollii Newsletter",
+    "get_new_offers_and_news": "Get New Offers And News",
+    "enter_email_address": "Enter your email address"
+  },
+  "searchCard": {
+    "destinations": "Destinations",
+    "cairo": "Cairo",
+    "alexandria": "Alexandria",
+    "sharmElSheikh": "Sharm El Sheikh",
+    "hurghada": "Hurghada",
+    "aswan": "Aswan",
+    "travellers": "Travellers",
+    "adults": "Adults",
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "search": "Search"
+  },
+  "personalDetails": {
+    "personalDetails": "Personal Details",
+    "paymentDetails": "Payment Details",
+    "privacyPolicy": "Privacy and Policy",
+    "updateInfo": "Update your info and personal details",
+    "changeProfilePicture": "Change Profile Picture",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "expireDate": "Expire Date",
+    "default": "Default",
+    "requestData": "Request Your Personal Data",
+    "requestDataDesc": "We’ll create a file for you to download your personal details",
+    "deactivateAccount": "Deactivate Your Account",
+    "deactivateAccountDesc": "This will deactivate your account temporarily until whenever you come back",
+    "deleteAccount": "Delete Your Account",
+    "deleteAccountDesc": "This will permanently delete your account and your data",
+    "deactivateAlert": "Your account is deactivated",
+    "deleteAlert": "Your account is deleted"
+  },
+  "tourDetails": {
+    "Duration": "Duration",
+    "Tour Type": "Tour Type",
+    "Group Size": "Group Size",
+    "Language": "Language",
+    "About Tour": "About Tour",
+    "Highlights": "Highlights",
+    "Included & Excluded": "Included & Excluded",
+    "full day": "full day",
+    "arabic and english": "arabic and english"
+  },
+  "tabs": {
+    "overview": "Overview",
+    "program": "Program",
+    "review": "Review",
+    "questions": "Questions",
+    "programContent": "Program Content",
+    "programContentDescription": "This is the content for the Program tab."
+  },
+  "touristQuestions": {
+    "touristQuestions": "What tourists ask about the tour",
+    "hotelTransfers": "Do you offer hotel transfers?",
+    "hotelTransfersDescription": "Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case a tour operator representative will be at the hotel to pick you up. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.",
+    "accessibilityStaff": "Do you offer accessibility staff?",
+    "cancellationPolicy": "Cancellation policy",
+    "cancellationPolicyDescription": "You can cancel up to 24 hours in advance of the experience for a full refund.",
+    "fullRefund": "For a full refund, you must cancel at least 24 hours before the experience’s start time",
+    "partialRefund": "If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded",
+    "noChangesAccepted": "Any changes made less than 24 hours before the experience’s start time will not be accepted"
+  },
+  "ToggleButtonGroup": {
+    "recommended": "Recommended",
+    "topRated": "Top Rated",
+    "mostPopular": "Most popular",
+    "cheapest": "Cheapest"
+  },"ToursCard": {
+    "featured": "Featured",
+    "reviews": "Reviews",
+    "to": "to",
+    "freeCancellation": "Free Cancellation",
+    "from": "From",
+    "currency": "EGP",
+    "saving": "Saving",
+    "priceVaries": "Price varies per person",
+    "selectTour": "Select Tour"
+  }, "navbar": {
+    "home": "Home",
+    "favourites": "Favourites",
+    "bookings": "Bookings",
+    "settings": "Settings",
+    "logout": "Log out",
+    "login": "Login"
+  }, "footer": {
+    "company": "Company",
+    "about": "About",
+    "mobile": "Mobile",
+    "blog": "Blog",
+    "howWeWork": "How We Work",
+    "legal": "Legal",
+    "termsConditions": "Terms & Conditions",
+    "privacyPolicy": "Privacy Policy",
+    "support": "Support",
+    "contactUs": "Contact Us",
+    "faqs": "FAQs",
+    "more": "More",
+    "airlineFees": "Airline Fees",
+    "airlines": "Airlines",
+    "partners": "Partners",
+    "advertiseWithUs": "Advertise With Us"
+  },"reviews": {
+    "review": "Review",
+    "numberOfReviews": "(300 reviews)",
+    "excellent": "Excellent",
+    "very_good": "Very Good",
+    "average": "Average",
+    "poor": "Poor",
+    "bad": "Very Bad",
+    "helpful": "Helpful",
+    "reviewparagraph":"Showing 1 to 2 of 250 reviews",
+    "write_a_review": "Write a Review",
+    "leave_a_review": "Leave a Review",
+    "email_note": "Your email address will not be displayed to others",
+    "post_review": "Post Review",
+    "userName": "User Name", 
+  "date": "Date",
+  "reviewTitle": "It was an amazing place", 
+  "reviewTextShort": "One of the best experiences I've ever had. Lots of fun, and very interesting places to see and learning about. Our spectacular guide, one of the best made us feel part of his family, very respectful and wise, answered any doubt or question we had, really a great help at all times....", 
+  "reviewTextFull": " One of the best experiences I've ever had. Lots of fun, and very interesting places to see and learning about. Our spectacular guide, one of the best made us feel part of his family, very respectful and wise, answered any doubt or question we had, really a great help at all times. I highly recommend this tour and especially our guide Phoebe, We had a 22 hour layover in Cairo and wanted to do a tour of the top sites. Zenab was our guide and she was absolutely fantastic! Went hit the sites we wanted to and she had great knowledge of everything! Would definitely recommend", 
+  "showLess": "...Less"
+},
+"form": {
+  "namePlaceholder": "Your Name",
+  "emailPlaceholder": "E-mail",
+  "reviewTitlePlaceholder": "Give your review a title",
+  "writeReviewPlaceholder": "Write your review",
+  "submitButton": "Post review",
+  "guide":"Guide",
+      "location":"Location",
+      "cleanliness":"Cleanliness",
+      "transportion":"Transportion",
+      "service":"Service"
+},"questions": {
+  "what_tourists_ask": "What tourists ask about the tour",
+  "hotel_transfers": "Do you offer hotel transfers?",
+  "hotel_transfers_description": "Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case, a tour operator representative will be at the hotel to pick you up. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.",
+  "accessibility_staff": "Do you offer accessibility staff?",
+  "accessibility_staff_description": "Yes, we offer accessibility staff to assist individuals with disabilities during the tour. Please inform us in advance about any specific requirements.",
+  "cancellation_policy": "Cancellation policy",
+  "cancellation_policy_description": "You can cancel up to 24 hours in advance of the experience for a full refund.",
+  "full_refund": "For a full refund, you must cancel at least 24 hours before the experience’s start time",
+  "no_refund": "If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded",
+  "no_changes": "Any changes made less than 24 hours before the experience’s start time will not be accepted"
+}, "related_tours":{
+  "relatedTours": "Related Tours",
+  "featured": "Featured",
+  "reviews": "Reviews",
+  "from": "From",
+  "hours": "Hours",
+  "freeCancellation": "Free Cancellation"
+},"tours": {
+  "total": "Total",
+  "bookNow": "Book now"
+}, "time":{
+  "destination": "Destination",
+"date": "Date",
+"time": "Time",
+"group": "Group",
+"people": "People",
+"cairoZone": "Cairo Zone"
+}, "tours_card": {
+  "featured": "Featured",
+  "reviews": "Reviews",
+  "free_cancellation": "Free Cancellation",
+  "saving": "Saving",
+  "prices_varies": "Price varies per person",
+  "select_tour": "Select Tour"
+}, "profile": {
+  "accountSettings": "Account Settings",
+  "personalDetails": "Personal Details",
+  "privacyandSafety": "Privacy and Safety",
+  "paymentDetails": "Payment Details",
+  "siteSettings": "Site Settings",
+  "updateYourInfo": "Update Your Info And Personal Details",
+  "changeProfilePicture": "Change Profile Picture",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "email": "Email",
+  "requestYouPersonalData": "Request Your Personal Data",
+  "createFile": "we'll create a file for you to download your personal details",
+  "deactivateYourAccount": "Deactivate Your Account",
+  "deactivateYourAccountTemp": "we will deactivate your account temporarily until whenever you come back",
+  "deleteYourAccount": "Delete Your Account",
+  "permanentlyDelete": "This will permanently delete your account and your data",
+  "default": "Default",
+  "expires": "Expires",
+  "addCard": "Add Card",
+  "language": "Language",
+  "currency": "Currency"
+}
+}

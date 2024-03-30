@@ -1,0 +1,23 @@
+Pages:
+Home Page: (Edited) Remove "Flights,Hotels,Tours,Cars,Cruises" Tabs and implement Tours Section
+Search Page
+Tours Details Page
+Payment Page (Edited)
+Payment Feedback Page (Edited)
+Profile Page
+Contact Us Page
+Bookings Page
+Sign Pages (Edited)
+Dashboard Page (Home, Bookings, Discount,Logout)
+======================================================================================
+Components:
+Navbar (Edited)
+Footer (Edited)
+Search Component
+Geolocation
+Tours Info Card
+Pagination
+Bagdge Number Component (Edited)
+Payment Details Component (Payment Feedback Page, Payment Page) (Edited)
+Activity Details Component (Payment Feedback Page, Payment Page) (Edited)
+OTP Modal Component

@@ -1,0 +1,107 @@
+{
+    "related_tours": [
+      {
+        "tour_id": 1,
+        "image_url": "../../Images/RelatedTours/pyramids.jpg",
+        "location": "Giza, Egypt",
+        "description": "Full-Day Tour Giza you can visit Great Pyramids,Sphinx, Memphis",
+        "review_stars": 4.8,
+        "price_starts_from": "$50",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": true,
+        "num_reviews":250
+      },
+      {
+        "tour_id": 2,
+        "image_url": "../../Images/RelatedTours/aswan3.jpg",
+        "location": "Aswan, Egypt",
+        "description": "Full-Day Tour aswan you can visit The Aswan reservoir, ",
+        "review_stars": 4.6,
+        "price_starts_from": "$60",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": true,
+        "num_reviews":300
+
+      },
+      {
+        "tour_id": 3,
+        "image_url": "../../Images/RelatedTours/cairo2.jpg",
+        "location": "Cairo, Egypt",
+        "description": "Full-Day Tour Cairo you can visit cairo tour, Al-Hussein  ",
+        "review_stars": 4.9,
+        "price_starts_from": "$45",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": false,
+        "num_reviews":230
+
+      },
+      {
+        "tour_id": 4,
+        "image_url": "../../Images/RelatedTours/luxor.jpg",
+        "location": "Luxor, Egypt",
+        "description": "Full-Day Tour Luxor Great Sphinx, Memphis, and saqqara",
+        "review_stars": 4.9,
+        "price_starts_from": "$45",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": false,
+        "num_reviews":230
+
+      },
+      {
+        "tour_id": 5,
+        "image_url": "../../Images/RelatedTours/pyramids.jpg",
+        "location": "Giza, Egypt",
+        "description": "Full-Day Tour Giza you can visit Great Pyramids,Sphinx, Memphis",
+        "review_stars": 4.8,
+        "price_starts_from": "$50",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": true,
+        "num_reviews":250
+      },
+      {
+        "tour_id": 6,
+        "image_url": "../../Images/RelatedTours/aswan3.jpg",
+        "location": "Aswan, Egypt",
+        "description": "Full-Day Tour aswan you can visit The Aswan reservoir, ",
+        "review_stars": 4.6,
+        "price_starts_from": "$60",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": true,
+        "num_reviews":300
+
+      },
+      {
+        "tour_id": 7,
+        "image_url": "../../Images/RelatedTours/cairo2.jpg",
+        "location": "Cairo, Egypt",
+        "description": "Full-Day Tour Cairo you can visit cairo tour, Al-Hussein  ",
+        "review_stars": 4.9,
+        "price_starts_from": "$45",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": false,
+        "num_reviews":230
+
+      },
+      {
+        "tour_id": 8,
+        "image_url": "../../Images/RelatedTours/luxor.jpg",
+        "location": "Luxor, Egypt",
+        "description": "Full-Day Tour Luxor Great Sphinx, Memphis, and saqqara",
+        "review_stars": 4.9,
+        "price_starts_from": "$45",
+        "tour_hours_from": "8 ",
+        "tour_hours_to": "10 ",
+        "free_cancellation": false,
+        "num_reviews":230
+
+      }
+    ]
+  }
+  

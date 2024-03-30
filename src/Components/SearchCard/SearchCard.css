@@ -1,0 +1,106 @@
+.search-card {
+    border: 1px solid #ccc;
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    position: relative;
+    filter: drop-shadow(0px 2px 8px rgba(38, 36, 131, 0.25));
+    margin: 3.75em 0 6.5em
+  }
+  @media (max-width:900px) {
+    .search-card {
+        flex-direction: column;
+    }
+  }
+  .input-group {
+    margin-bottom: 15px;
+    flex-basis: calc(25% - 10px);
+  }
+  
+  .input-group label {
+    font-weight: bold;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+  }
+  
+  .input-group input[type="text"],
+  .input-group input[type="date"],
+  .input-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 20px !important;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .input-group select {
+    appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="#000000" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px 20px;
+  }
+  
+  .input-group input[type="text"]:hover,
+  .input-group input[type="date"]:hover,
+  .input-group select:hover,
+  .input-group input[type="text"]:focus,
+  .input-group input[type="date"]:focus,
+  .input-group select:focus {
+    outline: none;
+    border-color: #5F41B2;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+  }
+  
+  .travellers-dropdown {
+    position: absolute;
+    top: calc(100% + 0px); /* Position below the travellers input */
+    left: 0;
+    z-index: 1; /* Ensure it appears above other content */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .travellers-dropdown div {
+    padding: 10px;
+  }
+  
+  .travellers-dropdown div div {
+    margin-top: 5px;
+    text-align: left;
+  }
+  
+  .travellers-dropdown div button {
+    background-color: #5F41B2;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .travellers-dropdown div button:hover {
+    background-color: #5F41B2;
+  }
+  
+  .search-button {
+    background-color: #5f41b2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 15px auto 4px;
+    width: 200px;
+  }
+  
+  .search-button:hover {
+    background-color: #4e389d;
+  }

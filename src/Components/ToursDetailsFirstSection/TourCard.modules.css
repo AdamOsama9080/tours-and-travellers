@@ -1,0 +1,28 @@
+.tour-details-card-container{
+    position: relative;
+    padding-left:0px !important;
+    padding-right: 0px !important;
+}
+.card-bookmark-container{
+    padding: 0px !important;
+    text-align: end;
+}
+.card-bookmark{
+    position: absolute;
+    top: 0px;
+    right:.5%;
+    font-weight: 800 !important;
+}
+/* .tour-details-card-images{
+} */
+.tour-details-card-header{
+    padding-left:2%;
+}
+.tour-details-card-other-images{
+    padding-bottom: 0px !important;
+    margin-bottom: 0px !important;
+}
+.tour-details-card-other-images>.row>.col{
+    padding-left: 0px !important;
+    padding-bottom: 0px !important;
+}

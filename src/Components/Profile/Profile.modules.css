@@ -1,0 +1,43 @@
+/* styles.css */
+
+.card {
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin: 20px;
+  }
+  
+  .details-section {
+    display: none;
+  }
+  
+  .active {
+    display: block;
+   
+  }
+  
+  .icon {
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+  
+  .toggle-button {
+    cursor: pointer;
+    color: #3B3666;
+    font-weight: bold;
+  }
+  
+  .toggle-button:hover {
+    text-decoration: underline;
+  
+  }
+  .credit-card {
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .credit-card img {
+    width: 50px;
+    margin-right: 10px;
+  }

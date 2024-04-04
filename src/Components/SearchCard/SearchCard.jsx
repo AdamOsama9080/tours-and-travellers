@@ -69,7 +69,7 @@ const SearchCard = () => {
     data.destination = data.destination.charAt(0).toUpperCase() + data.destination.slice(1) + ", Egypt";
   
     try {
-      const response = await axios.post("http://localhost:2000/filter-trips", data);
+      const response = await axios.post("http://localhost:2000/tours/filter-trips", data);
       if (response && response.data) { 
         if (response.data.status === "success") {
           console.log("Data has been retrieved successfully");

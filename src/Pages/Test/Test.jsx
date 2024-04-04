@@ -27,6 +27,11 @@ import { ModalProvider } from "../../Contexts/pypalContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SearchProvider } from "../../Contexts/SearchResultContext";
 import ToursDetailsandBooking from "../../Components/Tours Detailsand information/ToursDetailsandBooking";
+import ContactUs from "../ContactUs/ContactUs";
+import Aboutus from "../AboutUs/Aboutus";
+import Frequentlyaskedquestions from "../Frequentlyaskedquestions/Frequentlyaskedquestions";
+import BookingVisa from "../BookingVisa/BookingVisa";
+import OrderResponse from "../OrderResponse/OrderResponse";
 const getUserRole = () => {
   const role = localStorage.getItem("role");
   return role ? role : "";
@@ -77,7 +82,12 @@ export default function Test() {
                           </Route>
                         )}
                         {/* <Route path="/tours" element={<ToursDetails />} /> */}
-                        <Route path="/tours" element={<ToursDetailsandBooking></ToursDetailsandBooking>}></Route>
+                        <Route path="/tours/:tourId" element={<ToursDetailsandBooking></ToursDetailsandBooking>}></Route>
+                        <Route path="/ContactUs" element={<ContactUs />}></Route>
+                        <Route path="/AboutUs" element={<Aboutus></Aboutus>}></Route>
+                        <Route path="/Frequentlyaskedquestions" element={<Frequentlyaskedquestions></Frequentlyaskedquestions>}></Route>
+                        <Route path="/BookingVisa" element={<BookingVisa></BookingVisa>}></Route>
+                        <Route path="OrderResponse" element={<OrderResponse></OrderResponse>}></Route>
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </SearchProvider>

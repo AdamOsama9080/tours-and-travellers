@@ -1,18 +1,349 @@
-import React, { useState } from 'react'
-import Navbar from '../Navbar/Navbar'
-import Footer from '../Footer/Footer'
-import { colors } from '../../colors'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../Navbar/Navbar';
+import Footer from '../Footer/Footer';
+import { colors } from '../../colors';
 import { Rating } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import axios from 'axios';
+import Swal from 'sweetalert2';
+import { useAuth } from "../../Contexts/authContext ";
+
 
 export default function ToursDetailsandBooking() {
     const [activeTab, setActiveTab] = useState('overview');
+    const [tourData, setTourData] = useState(null); 
+    const [relatedTour, setRelatedTour] = useState([]);
+    const [visibleTours, setVisibleTours] = useState(3); 
+    const [tourReviews, setTourReviews] = useState([]);
+    const [tourRate, setTourRate] = useState(0);
+    const [excellentRate, setExcellentRate] = useState(0);
+    const [veryGoodRate, setVeryGoodRate] = useState(0);
+    const [averageRate, setAverageRate] = useState(0);
+    const [goodRate, setGoodRate] = useState(0);
+    const [poorRate, setPoorRate] = useState(0);
+    const [tourQuality, setTourQuality] = useState("");
 
+
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        reviewTitle: '',
+        reviewText: '',
+        guideRating: 0,
+        locationRating: 0,
+        cleanlinessRating: 0,
+        serviceRating: 0,
+        transportationRating: 0
+    });
+
+    const {user} = useAuth();
+    console.log(user.id);
+    
+    const navigate = useNavigate();
+    
+    const { tourId } = useParams();
+    console.log('this is the tour id =>', tourId);
+    
     function handleTabClick(tab) {
         setActiveTab(tab);
     }
+    
+    useEffect(() => {
+        axios.get(`http://localhost:2000/tours/tour/${tourId}`)
+        .then(response => {
+            console.log('Response:', response);
+            const tourInfo = response.data.data;
+            console.log('Tour Info:', tourInfo);
+            setTourData(tourInfo);
+        })
+        .catch(error => {
+            console.error("Error fetching tour data:", error);
+        });
+    }, [tourId]);
+    
+    console.log(tourData);
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const handleRatingChange = (name, value) => {
+        setFormData(prevState => ({
+            ...prevState,
+            [name]: value
+        }));
+    };
+
+    const calculateAverageRating = () => {
+        const totalRatings = Object.values(formData).filter(value => typeof value === 'number').reduce((acc, curr) => acc + curr, 0);
+        const totalCategories = Object.keys(formData).length - 4; // Subtracting name, email, reviewTitle, reviewText
+        return totalRatings / totalCategories;
+    };
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        console.log('Form Data:', formData);
+        try {
+            const response = await axios.post('http://localhost:2000/reviews/review', {
+                name: formData.name,
+                email: formData.email,
+                guideRating: formData.guideRating,
+                locationRating: formData.locationRating,
+                cleanlinessRating: formData.cleanlinessRating,
+                serviceRating: formData.serviceRating,
+                transportationRating: formData.transportationRating,
+                userId: user.id,
+                tourId: tourId,
+                reviewText: formData.reviewText,
+                reviewTitle: formData.reviewTitle,
+                rating: calculateAverageRating()
+            });
+            console.log("Review posted:", response.data);
+            setFormData({
+                name: '',
+                email: '',
+                reviewTitle: '',
+                reviewText: '',
+                guideRating: 0,
+                locationRating: 0,
+                cleanlinessRating: 0,
+                serviceRating: 0,
+                transportationRating: 0
+            });
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Your review has been submitted.',
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+            });
+        }
+    }
+
+
+    useEffect(() => {
+        if (tourData) {
+            axios.post(`http://localhost:2000/tours/related-tours`, {
+                location: tourData.location
+            }).then(response => {
+                console.log('Response:', response);
+                setRelatedTour(response.data.data);
+            }).catch(error => {
+                console.error("Error fetching related tours:", error);
+            });
+        }
+    }, [tourData]);
+
+    console.log(relatedTour);
+useEffect(() => {
+    axios.get(`http://localhost:2000/reviews/reviews/tour/${tourId}`)
+        .then(response => {
+            console.log('Response:=====>', response.data);
+            const tourReviewsData = response.data;
+            console.log('Tour Info:', tourReviewsData);
+
+            let totalRating = 0;
+            let excellentTotalRating = 0;
+            let veryGoodTotalRating = 0;
+            let averageTotalRating = 0;
+            let goodTotalRating = 0;
+            let poorTotalRating = 0;
+            let excellentCount = 0;
+            let veryGoodCount = 0;
+            let averageCount = 0;
+            let goodCount = 0;
+            let poorCount = 0;
+            let tourQuality = "" ; 
+
+            for (let i = 0; i < tourReviewsData.length; i++) {
+                const rating = tourReviewsData[i].rating;
+                totalRating += rating;
+
+
+                
+                
+                switch (Math.floor(rating)) {
+                    case 5:
+                        excellentTotalRating += rating;
+                        excellentCount++;
+                        break;
+                    case 4:
+                        veryGoodTotalRating += rating;
+                        veryGoodCount++;
+                        break;
+                    case 3:
+                        averageTotalRating += rating;
+                        averageCount++;
+                        break;
+                    case 2:
+                        goodTotalRating += rating;
+                        goodCount++;
+                        break;
+                    default:
+                        poorTotalRating += rating;
+                        poorCount++;
+                        break;
+                }
+            }
+
+            const averageRating = totalRating / tourReviewsData.length;
+            const excellentAverageRating = excellentCount > 0 ? excellentTotalRating / excellentCount : 0;
+            const veryGoodAverageRating = veryGoodCount > 0 ? veryGoodTotalRating / veryGoodCount : 0;
+            const averageAverageRating = averageCount > 0 ? averageTotalRating / averageCount : 0;
+            const goodAverageRating = goodCount > 0 ? goodTotalRating / goodCount : 0;
+            const poorAverageRating = poorCount > 0 ? poorTotalRating / poorCount : 0;
+            
+            switch (Math.floor(averageRating)) {
+                case 5:
+                    tourQuality = "Excellent";
+                    break;
+                case 4:
+                    tourQuality = "Very Good";
+                    break;
+                case 3:
+                    tourQuality = "Average";
+                    break;
+                case 2:
+                    tourQuality = "Good";
+                    break;
+                default:
+                    tourQuality = "Poor";
+                    break;
+            }
+            setTourQuality(tourQuality);
+            
+            setTourRate(averageRating);
+            setExcellentRate(excellentAverageRating);
+            setVeryGoodRate(veryGoodAverageRating);
+            setAverageRate(averageAverageRating);
+            setGoodRate(goodAverageRating);
+            setPoorRate(poorAverageRating);
+            
+            setTourReviews(tourReviewsData); // Set tourReviews to the array of reviews only
+        })
+        .catch(error => {
+            console.error("Error fetching tour reviews :", error);
+        });
+}, [tourId]);
+    
+    
+    
+
+    console.log(tourReviews);
+
+    const handleBookNowClick = () => {
+        if (!tourData) return; 
+
+        axios.get(`http://localhost:2000/tours/tour/${tourId}`)
+            .then(response => {
+                const tourInfo = response.data.data;
+                const emptyPlaces = tourInfo.emptyPlaces;
+
+                Swal.fire({
+                    title: "Enter number of travelers",
+                    input: "number",
+                    inputAttributes: {
+                        autocapitalize: "off",
+                        min: 1,
+                        max: Math.min(5, emptyPlaces), // Maximum number of travelers (up to 5 or available empty places)
+                        step: 1
+                    },
+                    showCancelButton: true,
+                    confirmButtonText: "Submit",
+                    allowOutsideClick: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const numberOfTravelers = parseInt(result.value);
+                        if (numberOfTravelers <= emptyPlaces && numberOfTravelers > 0) {
+                            navigate(`/BookingVisa`, { state: { numberOfTravelers ,tourId: tourId } });
+                        } else {
+                            Swal.fire({
+                                title: "Invalid number of travelers",
+                                text: "Please enter a valid number of travelers (1 to " + Math.min(5, emptyPlaces) + ").",
+                                icon: "error",
+                                confirmButtonText: "OK"
+                            });
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching tour data:", error);
+            });
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    };
+
+    const renderStars = (rating) => {
+        const goldStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 !== 0;
+
+        const stars = [];
+
+        for (let i = 0; i < goldStars; i++) {
+            stars.push(<i key={i} className="bi bi-star-fill" style={{ color: 'gold' }}></i>);
+        }
+
+        if (hasHalfStar) {
+            stars.push(<i key="half" className="bi bi-star-half" style={{ color: 'gold' }}></i>);
+        }
+
+        const remainingStars = 5 - goldStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < remainingStars; i++) {
+            stars.push(<i key={i + goldStars + (hasHalfStar ? 1 : 0)} className="bi bi-star" style={{ color: 'grey' }}></i>);
+        }
+
+        return stars;
+    };
+    const handleShowMoreClick = () => {
+        setVisibleTours(prevVisibleTours => prevVisibleTours + 3);
+    };
+
+    const handleDeleteReview = async (reviewId) => {
+        try {
+            const response = await axios.delete(`http://localhost:2000/reviews/review`, {
+                data: {
+                    userId: user.id,
+                    reviewId: reviewId
+                }
+            });
+            console.log("Review deleted:", response.data);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Your review has been deleted.',
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Something went wrong. Please try again later.',
+            });
+        }
+    };
+
+    if (!tourData) {
+        return <div>Loading...</div>;
+    }
+
+    
+
+
 
     return (
-        // <div>ToursDetailsandBooking</div>
         <>
             <Navbar></Navbar>
             <div className='container-fluid'>
@@ -23,19 +354,15 @@ export default function ToursDetailsandBooking() {
                                 <div className='row'>
                                     <div className='col-md-11 p-4 '>
                                         <h2 className='fw-bold' style={{ color: colors.secondary }} >
-                                            Full-Day Tour Giza Great Pyramids, Sphinx,Memphis, and Saqqara
+                                            {tourData.title}
                                         </h2>
                                         <div className=''>
-                                            <i className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                            <i className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                            <i className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                            <i className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                            <i className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                            <span className='ms-3' style={{ color: colors.primary }}>(250 reviews) </span>
+                                            {renderStars(tourData.rating)}
+                                            <span className='ms-3' style={{ color: colors.primary }}>({tourData.reviews.length} reviews) </span>
                                         </div>
                                         <div className='text-black-50 fw-bold'>
                                             <i className="bi bi-geo-alt-fill me-1" ></i>
-                                            <span style={{ color: colors.primary }}>cairo Egypt</span>
+                                            <span style={{ color: colors.primary }}>{tourData.location}</span>
                                         </div>
                                     </div>
                                     <div className='col-md-1 position-relative '>
@@ -69,11 +396,11 @@ export default function ToursDetailsandBooking() {
 
                                 <div className='row p-4'>
                                     <div className='col-md-9'>
-                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>500 EGY</h4>
+                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>{tourData.price} EGY</h4>
                                         <p className='text-black-50 fs-6'>Total</p>
                                     </div>
                                     <div className='col-md-3'>
-                                        <button className='btn text-white  w-100' style={{ backgroundColor: colors.secondary }}>Book Now</button>
+                                        <button className='btn text-white w-100' style={{ backgroundColor: colors.secondary }} onClick={handleBookNowClick}>Book Now</button>
                                     </div>
                                 </div>
                             </div>
@@ -85,19 +412,19 @@ export default function ToursDetailsandBooking() {
                             <div className='card-body p-0'>
                                 <div className='col-md-12' style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
                                     <h6 className='fs-5 fw-bold pt-3' style={{ color: colors.secondary, cursor: 'pointer' }}>Destination</h6>
-                                    <p className='fs-6 text-black-50'>Cairo , Egypt</p>
+                                    <p className='fs-6 text-black-50'>{tourData.destination}</p>
                                 </div>
                                 <div className='col-md-12' style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
                                     <h6 className='fs-5 fw-bold pt-3' style={{ color: colors.secondary, cursor: 'pointer' }}>Date</h6>
-                                    <p className='fs-6 text-black-50'>Cairo , Egypt</p>
+                                    <p className='fs-6 text-black-50'>{formatDate(tourData.startDate)}</p>
                                 </div>
                                 <div className='col-md-12' style={{ borderBottom: '1px solid rgba(0, 0, 0, 0.1)' }}>
                                     <h6 className='fs-5 fw-bold pt-3' style={{ color: colors.secondary, cursor: 'pointer' }}>Time</h6>
-                                    <p className='fs-6 text-black-50'>Cairo , Egypt</p>
+                                    <p className='fs-6 text-black-50'>{tourData.startTime}</p>
                                 </div>
                                 <div className='col-md-12'>
                                     <h6 className='fs-5 fw-bold pt-3' style={{ color: colors.secondary, cursor: 'pointer' }}>Group</h6>
-                                    <p className='fs-6 text-black-50'>Cairo , Egypt</p>
+                                    <p className='fs-6 text-black-50'>{tourData.totalTravelers} Travelers</p>
                                 </div>
                             </div>
                         </div>
@@ -124,248 +451,221 @@ export default function ToursDetailsandBooking() {
                                         </div>
                                     </div>
                                 </div>
-                                {/* <div>
-                            <div className='col-md-12 mt-5'>
-                                <div className='row p-3'>
-                                    <div className='col-md-3 d-flex'>
-                                        <i className="bi bi-clock fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                {
+                                    activeTab === 'overview' &&(
                                         <div>
-                                            <h6 className='fs-6 fw-bold'>Duration</h6>
-                                            <p className='fs-6 text-black-50'>10 Days</p>
+                                        <div className='col-md-12 mt-5'>
+                                            <div className='row p-3'>
+                                                <div className='col-md-3 d-flex'>
+                                                    <i className="bi bi-clock fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                                    <div>
+                                                        <h6 className='fs-6 fw-bold'>Duration</h6>
+                                                        <p className='fs-6 text-black-50'>{tourData.duration}</p>
+                                                    </div>
+            
+                                                </div>
+                                                <div className='col-md-3 d-flex'>
+                                                    <i className="bi bi-backpack fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                                    <div>
+                                                        <h6 className='fs-6 fw-bold'>Tour Type</h6>
+                                                        <p className='fs-6 text-black-50'>{tourData.type}</p>
+                                                    </div>
+                                                </div>
+                                                <div className='col-md-3 d-flex'>
+                                                <i class="bi bi-people fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                                <div>
+                                                    <h6 className='fs-6 fw-bold'>Group Size</h6>
+                                                    <p className='fs-6 text-black-50'>{tourData.totalTravelers} peoples</p>
+                                                </div>
+                                                </div>
+                                                <div className='col-md-3 d-flex'>
+                                                    <i className="bi bi-translate fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                                    <div>
+                                                        <h6 className='fs-6 fw-bold'>Languages</h6>
+                                                        <p className='fs-6 text-black-50'>English + 2more</p>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-
+            
+                                        <div className='col-md-12 mt-3 p-3'>
+                                            <h2 className='fs-1 fw-bold text-capitalize'>
+                                                About this tour
+                                            </h2>
+                                            <p className='fs-6 text-black-50'>{tourData.description}</p>
+                                        </div>
+            
+                                        <div className='col-md-12  p-3'>
+                                            <h2 className='fs-1 fw-bold text-capitalize'>
+                                                highlights
+                                            </h2>
+                                            <ul>
+                                                {tourData.highlights.map((highlight, index) => (
+                                                    <li key={index} className='fs-6 text-black-50'>{highlight}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+            
+                                        <div className='col-md-12 p-3'>
+                                            <h2 className='fs-1 fw-bold text-capitalize'>
+                                                included / excluded
+                                            </h2>
+                                            <div className='col-md-12 d-flex'>
+                                                <div className='col-md-6'>
+                                                    {tourData.included.map((included, index) => (
+                                                        <div key={index} className=''>
+                                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
+                                                            <span className='text-black  fs-6 text-capitalize'>{included}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className='col-md-6'>
+                                                    {tourData.excluded.map((excluded, index) => (
+                                                        <div key={index} className=''>
+                                                            <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
+                                                            <span className='text-black  fs-6 text-capitalize'>{excluded}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className='col-md-3 d-flex'>
-                                        <i className="bi bi-backpack fw-bold me-3" style={{fontSize:'2rem'}}></i>
+                                    )}
+
+                                {
+                                    activeTab === 'program' && (
                                         <div>
-                                            <h6 className='fs-6 fw-bold'>Tour Type</h6>
-                                            <p className='fs-6 text-black-50'>Daily Tour</p>
+                                        {
+                                            tourData.program.map((program, index) => (
+                                                <div key={index} className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                                                    <div className='d-flex align-items-center '>
+                                                        <i className={`bi bi-${index + 1}-circle fw-bold me-3`} style={{ color: colors.secondary, fontSize: '5rem' }}></i>
+                                                        <h4 className='font-capitalize'>{program}</h4>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        }
                                         </div>
-                                    </div>
-                                    <div className='col-md-3 d-flex'>
-                                    <i class="bi bi-people fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                    <div>
-                                        <h6 className='fs-6 fw-bold'>Group Size</h6>
-                                        <p className='fs-6 text-black-50'>6 peoples</p>
-                                    </div>
-                                    </div>
-                                    <div className='col-md-3 d-flex'>
-                                        <i className="bi bi-translate fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                        <div>
-                                            <h6 className='fs-6 fw-bold'>Languages</h6>
-                                            <p className='fs-6 text-black-50'>English + 2more</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className='col-md-12 mt-3 p-3'>
-                                <h2 className='fs-1 fw-bold text-capitalize'>
-                                    About this tour
-                                </h2>
-                                <p className='fs-6 text-black-50'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempore alias, voluptas fugit, officiis deleniti similique sit perspiciatis fugiat provident, unde minus consequuntur ducimus quae distinctio animi est libero magnam totam ipsam! Explicabo, quia nulla. Dolorem, a rem? Molestias dolor ratione dolorum mollitia sapiente aliquam voluptatem dolorem, labore quo asperiores id, quia excepturi eius minima eum quasi quas iure accusamus facilis at iusto voluptate nemo blanditiis! Laudantium mollitia veritatis quam nam, nulla placeat cupiditate quis aliquam error facere harum soluta saepe, excepturi vero optio voluptate, aperiam non officia. Placeat excepturi iusto voluptatibus, harum voluptatem odit ab, nesciunt consequatur enim, incidunt totam hic accusamus aperiam quo rerum minus veritatis tempora. Non tempore labore, repellat dolorum impedit mollitia odit eos amet sit quod perspiciatis dolore suscipit quos, nemo dolores molestiae assumenda ad ipsa voluptatum odio laborum blanditiis aliquid! Aut minima sint pariatur inventore accusamus magnam sed veritatis consequuntur. Labore, cumque neque! Veritatis ipsum molestiae a vel asperiores aperiam necessitatibus ullam quos delectus officia exercitationem, repellendus libero debitis nam modi obcaecati reiciendis, ab quidem in possimus. Earum, fugiat nam quia ad quod numquam blanditiis officiis cupiditate assumenda autem, error, dolorem molestiae quisquam voluptates expedita soluta quas excepturi ipsa facilis mollitia ipsum itaque at eaque.</p>
-                            </div>
-
-                            <div className='col-md-12  p-3'>
-                                <h2 className='fs-1 fw-bold text-capitalize'>
-                                    highlights
-                                </h2>
-                                <ul>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                    <li>Lorem ipsum dolor sit amet.</li>
-                                </ul>
-                            </div>
-
-                            <div className='col-md-12 p-3'>
-                                <h2 className='fs-1 fw-bold text-capitalize'>
-                                    included / excluded
-                                </h2>
-                                <div className='col-md-12 d-flex'>
-                                    <div className='col-md-6'>
-                                        <div className=''>
-                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                    </div>
-                                    <div className='col-md-6'>
-                                        <div className=''>
-                                            <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                        <div className=''>
-                                            <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
-                                            <span className='text-black  fs-6 text-capitalize'>private  transport</span> 
-                                        </div>
-                                    </div>
+                                )}
 
 
-                                </div>
-                            </div>
-                        </div> */}
-
-                                {/* <div>
-                                    <div className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                        <div className='d-flex align-items-center '>
-                                            <i class="bi bi-1-circle fw-bold me-3" style={{ color: colors.secondary, fontSize: '5rem' }}></i>
-                                            <h4 className='font-capitalize'>Departing</h4>
-                                        </div>
-                                    </div>
-                                    <div className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                        <div className='d-flex align-items-center '>
-                                            <i class="bi bi-2-circle fw-bold me-3" style={{ color: colors.secondary, fontSize: '5rem' }}></i>
-                                            <h4 className='font-capitalize'>BreakFast</h4>
-                                        </div>
-                                    </div>
-                                    <div className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                        <div className='d-flex align-items-center '>
-                                            <i class="bi bi-3-circle fw-bold me-3" style={{ color: colors.secondary, fontSize: '5rem' }}></i>
-                                            <h4 className='font-capitalize'>pyramids of giza</h4>
-                                        </div>
-                                    </div>
-                                    <div className='col-md-12 p-3' >
-                                        <div className='d-flex align-items-center '>
-                                            <i class="bi bi-4-circle fw-bold me-3" style={{ color: colors.secondary, fontSize: '5rem' }}></i>
-                                            <h4 className='font-capitalize'>saqqara</h4>
-                                        </div>
-                                    </div>
-                                </div> */}
-
-
-                                {/* <div>
+                                {
+                                    activeTab === 'reviews' && (
+                                <div>
                                     <div className='card'>
                                         <div className='row align-items-center'>
                                             <div className='col-md-5 fs-2 fw-bold border-right' style={{ borderRight: '4px solid rgba(0,0,0,0.1)' }}>
-                                                <p className='text-align-left' style={{ color: colors.secondary }}>5/5</p>
-                                                <p className='text-black'>Excellent</p>
+                                                <p className='text-align-left' style={{ color: colors.secondary }}>{tourRate}/5</p>
+                                                <p className='text-black'>{tourQuality}</p>
                                                 <div className='d-flex m-3 ms-0 fs-5'>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-
-                                                    <div className='text-black-50 ms-3'>(250 Reviews)</div>
+                                                    {renderStars(tourRate)}
+                                                    <div className='text-black-50 ms-3'>({tourReviews.length} Reviews)</div>
                                                 </div>
                                             </div>
 
                                             <div className='col-md-7 border-bottom-1'>
                                                 <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-2'>
-                                                        <p className='fw-bold me-4 fs-5 text-black-50'>Excellent</p>
+                                                    <div className='col-md-3'>
+                                                        <p className=' me-4 fs-5 text-black-50'>Excellent</p>
                                                     </div>
                                                     <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: '25%', backgroundColor: colors.secondary}}  />
+                                                        <div className="progress-bar " role="progressbar" style={{width: `${excellentRate}%`, backgroundColor: colors.secondary}}  />
                                                     </div>
                                                     <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >70</p>
+                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{excellentRate}</p>
                                                     </div>
                                                 </div>
                                                 <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-2'>
-                                                        <p className='fw-bold me-4 fs-5 text-black-50'>Very Good</p>
+                                                    <div className='col-md-3'>
+                                                        <p className=' me-4 fs-5 text-black-50'>Very Good</p>
                                                     </div>
                                                     <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: '25%', backgroundColor: colors.secondary}}  />
+                                                        <div className="progress-bar " role="progressbar" style={{width: `${veryGoodRate}%`, backgroundColor: colors.secondary}}  />
                                                     </div>
                                                     <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >70</p>
+                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{veryGoodRate}</p>
                                                     </div>
                                                 </div>
                                                 <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-2'>
-                                                        <p className='fw-bold me-4 fs-5 text-black-50'>Average</p>
+                                                    <div className='col-md-3'>
+                                                        <p className=' me-4 fs-5 text-black-50'>Average</p>
                                                     </div>
                                                     <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: '25%', backgroundColor: colors.secondary}}  />
+                                                        <div className="progress-bar " role="progressbar" style={{width: `${averageRate}%`, backgroundColor: colors.secondary}}  />
                                                     </div>
                                                     <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >70</p>
+                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{averageRate}</p>
                                                     </div>
                                                 </div>
                                                 <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-2'>
-                                                        <p className='fw-bold me-4 fs-5 text-black-50'>Good</p>
+                                                    <div className='col-md-3'>
+                                                        <p className=' me-4 fs-5 text-black-50'>Good</p>
                                                     </div>
                                                     <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: '25%', backgroundColor: colors.secondary}}  />
+                                                        <div className="progress-bar " role="progressbar" style={{width: `${goodRate}%`, backgroundColor: colors.secondary}}  />
                                                     </div>
                                                     <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >70</p>
+                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{goodRate}</p>
                                                     </div>
                                                 </div>
                                                 <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-2'>
-                                                        <p className='fw-bold me-4 fs-5 text-black-50'>Boor</p>
+                                                    <div className='col-md-3'>
+                                                        <p className=' me-4 fs-5 text-black-50'>Poor</p>
                                                     </div>
                                                     <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: '25%', backgroundColor: colors.secondary}}  />
+                                                        <div className="progress-bar " role="progressbar" style={{width: `${poorRate}%`, backgroundColor: colors.secondary}}  />
                                                     </div>
                                                     <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >70</p>
+                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{poorRate}</p>
                                                     </div>
                                                 </div>
-
                                             </div>
                                         </div>
                                     </div>
+
 
                                     <p className='w-100 text-center fw-bold fs-5 text-black-50'>250 reviews on this Tour-Showing 1 to 2</p>
 
-                                    <div className='review' style={{borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                        <div className='row p-3'>
-                                            <div className='col-md-4 d-flex align-items-center'>
-                                                <img src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{height: '150px', width: '150px'}}/>
-                                                <div className='ms-2'>
-                                                    <p className='text-black fw-bold fs-5 m-0'>Adam Osama</p>
-                                                    <p className='text-black-50 m-0'>Aug  12 2022</p>
-                                                    <div className='m-0'>
-                                                        <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                        <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                        <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                        <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                        <i class="bi bi-star-fill" style={{color:'gold'}}></i>
+
+                                    {tourReviews.length > 0 ? (
+                                    tourReviews.map((review, index) => (
+                                        <div className='review' key={index} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                                            <div className='row p-3'>
+                                                <div className='col-md-4 d-flex align-items-center'>
+                                                    <img src={review.profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{ height: '150px', width: '150px' }} />
+                                                    <div className='ms-2'>
+                                                        <p className='text-black fw-bold fs-5 m-0 text-capitalize'>{review.userId.firstName} {review.userId.lastName} {review.userId._id}</p>
+                                                        <p className='text-black-50 m-0'>{formatDate(review.reviewDate)}</p>
+                                                        <div className='m-0'>
+                                                            {[...Array(Math.floor(review.rating))].map((_, i) => (
+                                                                <i key={i} className="bi bi-star-fill" style={{ color: 'gold' }}></i>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className='col-md-8 text-left'>
+                                                    <p className='fs-5 fw-bold text-end m-0 me-5'>helpful <i className="bi bi-hand-thumbs-up" style={{ color: colors.secondary }}></i></p>
+                                                    {user && user.id === review.userId._id && (
+                                                        <>
+                                                            <p className='fs-5 fw-bold text-end m-0 me-5 mt-2'>Edit <i className="bi bi-pencil"></i></p>
+                                                            <p className='fs-5 fw-bold text-end m-0 me-5 mt-2' onClick={() => handleDeleteReview(review._id)}>Delete <i className="bi bi-trash3 text-danger"></i></p>
+                                                        </>
+                                                    )}
+                                                </div>
+
+                                                <div className='col-md-12'>
+                                                    <div className='mt-3'>
+                                                        <h5>{review.reviewTitle}</h5>
+                                                        <p className='text-black-50'>{review.reviewText}</p>
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            <div className='col-md-8'>
-                                                <p className='fs-5 fw-bold text-end m-0 me-5'>helpful <i class="bi bi-heart-fill" style={{color:colors.secondary}}></i></p>
-                                            </div>
-
-                                            <div className='col-md-12'>
-                                                <div className='mt-3'>
-                                                    <h5>It was an amazing Tour!</h5>
-                                                    <p className='text-black-50'>
-                                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Voluptatibus ducimus beatae consequatur, dicta eum dolorem natus quidem! Eveniet, iusto cumque! Quisquam qui nihil nostrum nulla fugiat officiis voluptates totam eum dolor optio repellendus explicabo, deserunt odit quidem autem similique eaque facere aspernatur reiciendis. Neque magnam iste facilis, reprehenderit numquam eveniet animi alias incidunt pariatur optio amet quod nostrum labore quos vitae. Nesciunt voluptate corporis ullam pariatur in impedit magnam maxime hic fugit sequi at, officiis reiciendis. Quibusdam fugiat corrupti est reiciendis neque nihil asperiores dolor quis deserunt aspernatur libero quidem iusto voluptates explicabo harum veniam illo dolores cum, dolorum ducimus nostrum illum! Facere dolorum incidunt delectus. Debitis obcaecati est consectetur sed in, nulla quaerat iste cupiditate fuga repellendus! Velit libero quae ullam, eum illum consequatur ipsa dolorem autem nihil harum quisquam iste, necessitatibus repudiandae veritatis ex error aut laudantium accusantium adipisci vitae magnam aliquam voluptas itaque. Quam iste ipsam fugiat perspiciatis quis incidunt placeat voluptates maiores tenetur, consectetur quae, animi unde saepe ducimus esse, nemo qui dolore aut. Reiciendis iste recusandae omnis perspiciatis corrupti consectetur itaque harum odio officia, rerum asperiores, ratione soluta sapiente. Iusto repellendus recusandae doloribus magni. Repellat omnis necessitatibus rerum quaerat ipsam autem doloribus natus velit officia?
-                                                    </p>
-                                                </div>
-                                            </div>
                                         </div>
-                                    </div>
+                                    ))
+                                ) : (
+                                    <div className="text-center mt-3">No reviews available.</div>
+                                )}
 
                                     <div className='add-review'>
 
@@ -376,80 +676,89 @@ export default function ToursDetailsandBooking() {
                                         <p className='fw-bold text-black-50 mt-2 mb-0'>Your e-mail address will not be show to other</p>
 
                                         <div className=''>
-                                            <form className='form-group'>
-
+                                        <form className='form-group' onSubmit={handleSubmit} >
                                                 <div className='row'>
-                                                        <div className='col-md-6'>
-                                                            <input type="text" className='form-control p-4 fs-5 my-3' placeholder='Name'></input>
+                                                    <div className='col-md-6'>
+                                                        <input type="text" className='form-control p-4 fs-5 my-3' placeholder='Name' name="name" value={formData.name} onChange={handleChange} required />
+                                                    </div>
+                                                    <div className='col-md-6'>
+                                                        <input type="email" className='form-control p-4 fs-5 my-3' placeholder='Email' name="email" value={formData.email} onChange={handleChange} required />
+                                                    </div>
+                                                    <div className='col-md-12'>
+                                                        <input type="text" className='form-control p-4 fs-5 ' placeholder='Give your review a title' name="reviewTitle" value={formData.reviewTitle} onChange={handleChange} required />
+                                                    </div>
+                                                    <div className='card col-md-6 m-0 my-3'>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <p className='fs-6 fw-bold text-black-50'>Guide</p>
+                                                            <Rating name="guideRating" value={formData.guideRating} onChange={(event, newValue) => handleRatingChange("guideRating", newValue)} style={{ color: "gold" }} />
                                                         </div>
-                                                        <div className='col-md-6'>
-                                                            <input type="email" className='form-control p-4 fs-5 my-3' placeholder='Email'></input>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <p className='fs-6 fw-bold text-black-50'>Location</p>
+                                                            <Rating name="locationRating" value={formData.locationRating} onChange={(event, newValue) => handleRatingChange("locationRating", newValue)} style={{ color: "gold" }} />
                                                         </div>
-                                                        <div className='col-md-12'>
-                                                            <input type="text" className='form-control p-4 fs-5 ' placeholder='Give your review a title'></input>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <p className='fs-6 fw-bold text-black-50'>Cleanliness</p>
+                                                            <Rating name="cleanlinessRating" value={formData.cleanlinessRating} onChange={(event, newValue) => handleRatingChange("cleanlinessRating", newValue)} style={{ color: "gold" }} />
                                                         </div>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <p className='fs-6 fw-bold text-black-50'>Service</p>
+                                                            <Rating name="serviceRating" value={formData.serviceRating} onChange={(event, newValue) => handleRatingChange("serviceRating", newValue)} style={{ color: "gold" }} />
+                                                        </div>
+                                                        <div className='d-flex justify-content-between'>
+                                                            <p className='fs-6 fw-bold text-black-50'>Transportation</p>
+                                                            <Rating name="transportationRating" value={formData.transportationRating} onChange={(event, newValue) => handleRatingChange("transportationRating", newValue)} style={{ color: "gold" }} />
+                                                        </div>
+                                                    </div>
 
-                                                        <div className='card col-md-6 m-0 my-3'>
-                                                            <div className='d-flex justify-content-between'>
-                                                                <p className='fs-6 fw-bold text-black-50'>Guide</p>
-                                                                <Rating name="simple-controlled" value="2"  style={{color:"gold"}}/>
-                                                            </div>
-                                                            <div className='d-flex justify-content-between'>
-                                                                <p className='fs-6 fw-bold text-black-50'>Location</p>
-                                                                <Rating name="simple-controlled" value="2"  style={{color:"gold"}}/>
-                                                            </div>
-                                                            <div className='d-flex justify-content-between'>
-                                                                <p className='fs-6 fw-bold text-black-50'>Cleanliness</p>
-                                                                <Rating name="simple-controlled" value="2"  style={{color:"gold"}}/>
-                                                            </div>
-                                                            <div className='d-flex justify-content-between'>
-                                                                <p className='fs-6 fw-bold text-black-50'>Service</p>
-                                                                <Rating name="simple-controlled" value="2"  style={{color:"gold"}}/>
-                                                            </div>
-                                                            <div className='d-flex justify-content-between'>
-                                                                <p className='fs-6 fw-bold text-black-50'>Transportaion</p>
-                                                                <Rating name="simple-controlled" value="2"  style={{color:"gold"}}/>
-                                                            </div>
-                                                        </div>
-
-                                                        <div className='col-md-6'>
-                                                            <textarea rows={7} type="text" className='form-control p-4 fs-5 my-3' placeholder='Write your review'></textarea>
-                                                        </div>
+                                                    <div className='col-md-6'>
+                                                        <textarea rows={7} type="text" className='form-control p-4 fs-5 my-3' placeholder='Write your review' name="reviewText" value={formData.reviewText} onChange={handleChange} required />
+                                                    </div>
                                                 </div>
 
+                                                <div className='d-flex justify-content-end'>
+                                                    <button type="submit" className='btn btn-warning px-5 text-white rounded-2 col-md-3' style={{ backgroundColor: colors.secondary }}>Post review</button>
+                                                </div>
                                             </form>
                                         </div>
                                     </div>
 
+
+
+
                                     
-                                </div> */}
+                                </div> 
+                            )}
 
 
-                                {/* <div className='Quetions'>
-                                    <div className=''>
-                                        <h2 className='fw-bold fs-1'>What tourists ask about the tour ?</h2>
+                           {
+                               activeTab === 'questions' && (
+                                <div className='Quetions'>
+                                <div className=''>
+                                    <h2 className='fw-bold fs-1'>What tourists ask about the tour ?</h2>
+                                </div>
+                                <div className='row'>
+                                    <div className='card  col-md-11'>
+                                        <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer hotel transfers?</h3>
+                                        <p className='fw-bold w-75 mt-2 text-black-50'>Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case a tour operator representative will be at the hotel to pickup you you. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.</p>
                                     </div>
-                                    <div className='row'>
-                                        <div className='card  col-md-11'>
-                                            <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer hotel transfers?</h3>
-                                            <p className='fw-bold w-75 mt-2 text-black-50'>Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case a tour operator representative will be at the hotel to pickup you you. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.</p>
-                                        </div>
-                                        <div className='card col-md-11'>
-                                            <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer accessiblity staffs.</h3>
-                                        </div>
+                                    <div className='card col-md-11'>
+                                        <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer accessiblity staffs.</h3>
                                     </div>
-                                    <div className='col-md-6' style={{borderTop:"1px solid rgba(0,0,0,0.1)"}}>
-                                        <h2 className='fw-bold fs-1 pt-3'>Cancellation policy</h2>
-                                    </div>                                
-                                    <div>
-                                        <p className='text-black-50'>You can cancel up to 24 hours in advance of the experience for a full refund.</p>
-                                        <ul>
-                                            <li className='text-black-50'>For a full refund, you must cancel at least 24 hours before the experience’s start time.</li>
-                                            <li className='text-black-50'>If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded.</li>
-                                            <li className='text-black-50'>Any changes made less than 24 hours before the experience’s start time will not be accepted.</li>
-                                        </ul>
-                                    </div>
-                                </div> */}
+                                </div>
+                                <div className='col-md-6' style={{borderTop:"1px solid rgba(0,0,0,0.1)"}}>
+                                    <h2 className='fw-bold fs-1 pt-3'>Cancellation policy</h2>
+                                </div>                                
+                                <div>
+                                    <p className='text-black-50'>You can cancel up to 24 hours in advance of the experience for a full refund.</p>
+                                    <ul>
+                                        <li className='text-black-50'>For a full refund, you must cancel at least 24 hours before the experience’s start time.</li>
+                                        <li className='text-black-50'>If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded.</li>
+                                        <li className='text-black-50'>Any changes made less than 24 hours before the experience’s start time will not be accepted.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                               )
+                           }
 
 
                             </div>
@@ -468,147 +777,63 @@ export default function ToursDetailsandBooking() {
                         </h2>
 
                         <div className='row'>
-                            <div className='col-md-4 d-flex justify-content-center '>
-                                <div class="card p-0 w-75">
-                                    <div className='position-relative'>
-                                        <img src="https://i.pinimg.com/564x/9c/70/7b/9c707b0ffd93a9a3268815dbed5b2fb0.jpg" class="card-img-top img-fluid" alt="..." style={{height:"300px" }}/>
-                                        <i class="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white " style={{ fontSize: '3rem' , top:"-13px" , right:"15px" , cursor:"pointer"}}></i>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{backgroundColor:colors.secondary , top:"2rem" , left:"4rem"}}>featured</p>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1  rounded-2 bg-danger' style={{ top:"5rem" , left:"3rem"}}>-80 %</p>
-                                    </div>
-                                    <div class="card-body">
-                                        <div className='d-flex fs-6'>
-                                        <i class="bi bi-geo-alt me-3"></i>
-                                        <p className='text-capitalize'>cairo, egypt</p>
+                            {relatedTour.slice(0, visibleTours).map((tour, index) => (
+                                <div className='col-md-4 d-flex justify-content-center' key={index}>
+                                    <div className="card p-0 w-75">
+                                        <div className='position-relative'>
+                                            <img src="https://i.pinimg.com/564x/9c/70/7b/9c707b0ffd93a9a3268815dbed5b2fb0.jpg" className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
+                                            <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
+                                            {tour.Featured && (
+                                                <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
+                                            )}
+                                            {
+                                                tour.disscount && (
+                                                    <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1  rounded-2 bg-danger' style={{ top: "5rem", left: "3rem" }}>-80 %</p>
+                                                )
+                                            }
                                         </div>
+                                        <div className="card-body">
+                                            <div className='d-flex fs-6'>
+                                                <i className="bi bi-geo-alt me-3"></i>
+                                                <p className='text-capitalize'>{tour.location}</p>
+                                            </div>
 
-                                        <div className='border-bottom'>
-                                            <div className='fw-bold fs-5'>Lorem ipsum, dolor sit amet consectetur adipisicing.</div>
+                                            <div className='border-bottom'>
+                                                <div className='fw-bold fs-5'>{tour.description}</div>
                                                 <div className='d-flex m-3 ms-0'>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
+                                                    {renderStars(tour.rating)}
 
-                                                    <div className='text-black-50 ms-3'>(250 Reviews)</div>
-                                                </div>
-                                        </div>
-
-                                        <div className='d-flex justify-content-between mt-3'>
-                                            <div className=''>
-                                                <div className='d-flex flex-row-reverse'>
-                                                    <del className='fw-bold text-black-50 '>1100</del>
-                                                </div>
-                                                <div className='d-flex align-items-center'>
-                                                    <p>From</p>
-                                                    <p className='ms-3 fw-bold fs-4' style={{color:colors.secondary}}>EGY 1000</p>
+                                                    <div className='text-black-50 ms-3'>({tour.reviews.length} Reviews)</div>
                                                 </div>
                                             </div>
 
-                                            <div >
-                                                <p className='text-black-50'><i class="bi bi-clock"></i> 10 days</p>
-                                                <p className='text-black-50'><i class="bi bi-check2"></i> free cancellation</p>
+                                            <div className='d-flex justify-content-between mt-3'>
+                                                <div className=''>
+                                                    <div className='d-flex flex-row-reverse'>
+                                                        <del className='fw-bold text-black-50 '>1100</del>
+                                                    </div>
+                                                    <div className='d-flex align-items-center'>
+                                                        <p>From</p>
+                                                        <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{tour.price} EGY</p>
+                                                    </div>
+                                                </div>
+
+                                                <div>
+                                                    <p className='text-black-50 m-0'><i className="bi bi-clock"></i> {tour.duration}</p>
+                                                    <p className='text-black-50 m-0'><i className="bi bi-check2"></i> free cancellation</p>
+                                                </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
-                            </div>
-                            <div className='col-md-4 d-flex justify-content-center'>
-                                <div class="card p-0 w-75">
-                                    <div className='position-relative'>
-                                        <img src="https://i.pinimg.com/564x/9c/70/7b/9c707b0ffd93a9a3268815dbed5b2fb0.jpg" class="card-img-top img-fluid" alt="..." style={{height:"300px" }}/>
-                                        <i class="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white " style={{ fontSize: '3rem' , top:"-13px" , right:"15px" , cursor:"pointer"}}></i>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{backgroundColor:colors.secondary , top:"2rem" , left:"4rem"}}>featured</p>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1  rounded-2 bg-danger' style={{ top:"5rem" , left:"3rem"}}>-80 %</p>
-                                    </div>
-                                    <div class="card-body">
-                                        <div className='d-flex fs-6'>
-                                        <i class="bi bi-geo-alt me-3"></i>
-                                        <p className='text-capitalize'>cairo, egypt</p>
-                                        </div>
-
-                                        <div className='border-bottom'>
-                                            <div className='fw-bold fs-5'>Lorem ipsum, dolor sit amet consectetur adipisicing.</div>
-                                                <div className='d-flex m-3 ms-0'>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-
-                                                    <div className='text-black-50 ms-3'>(250 Reviews)</div>
-                                                </div>
-                                        </div>
-
-                                        <div className='d-flex justify-content-between mt-3'>
-                                            <div className=''>
-                                                <div className='d-flex flex-row-reverse'>
-                                                    <del className='fw-bold text-black-50 '>1100</del>
-                                                </div>
-                                                <div className='d-flex align-items-center'>
-                                                    <p>From</p>
-                                                    <p className='ms-3 fw-bold fs-4' style={{color:colors.secondary}}>EGY 1000</p>
-                                                </div>
-                                            </div>
-
-                                            <div >
-                                                <p className='text-black-50'><i class="bi bi-clock"></i> 10 days</p>
-                                                <p className='text-black-50'><i class="bi bi-check2"></i> free cancellation</p>
-                                            </div>
-                                        </div>
-
+                            ))}
+                            {relatedTour.length > visibleTours && (
+                                <div className='d-flex justify-content-end'>
+                                    <div>
+                                        <p className='fs-5 pe-5' style={{ color: colors.secondary, cursor: "pointer" }} onClick={handleShowMoreClick}>Show More</p>
                                     </div>
                                 </div>
-                            </div>
-                            <div className='col-md-4 d-flex justify-content-center'>
-                                <div class="card p-0 w-75">
-                                    <div className='position-relative'>
-                                        <img src="https://i.pinimg.com/564x/9c/70/7b/9c707b0ffd93a9a3268815dbed5b2fb0.jpg" class="card-img-top img-fluid" alt="..." style={{height:"300px" }}/>
-                                        <i class="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white " style={{ fontSize: '3rem' , top:"-13px" , right:"15px" , cursor:"pointer"}}></i>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{backgroundColor:colors.secondary , top:"2rem" , left:"4rem"}}>featured</p>
-                                        <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1  rounded-2 bg-danger' style={{ top:"5rem" , left:"3rem"}}>-80 %</p>
-                                    </div>
-                                    <div class="card-body">
-                                        <div className='d-flex fs-6'>
-                                        <i class="bi bi-geo-alt me-3"></i>
-                                        <p className='text-capitalize'>cairo, egypt</p>
-                                        </div>
-
-                                        <div className='border-bottom'>
-                                            <div className='fw-bold fs-5'>Lorem ipsum, dolor sit amet consectetur adipisicing.</div>
-                                                <div className='d-flex m-3 ms-0'>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-                                                    <i class="bi bi-star-fill" style={{color:'gold'}}></i>
-
-                                                    <div className='text-black-50 ms-3'>(250 Reviews)</div>
-                                                </div>
-                                        </div>
-
-                                        <div className='d-flex justify-content-between mt-3'>
-                                            <div className=''>
-                                                <div className='d-flex flex-row-reverse'>
-                                                    <del className='fw-bold text-black-50 '>1100</del>
-                                                </div>
-                                                <div className='d-flex align-items-center'>
-                                                    <p>From</p>
-                                                    <p className='ms-3 fw-bold fs-4' style={{color:colors.secondary}}>EGY 1000</p>
-                                                </div>
-                                            </div>
-
-                                            <div >
-                                                <p className='text-black-50'><i class="bi bi-clock"></i> 10 days</p>
-                                                <p className='text-black-50'><i class="bi bi-check2"></i> free cancellation</p>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
+                            )}
                         </div>
                         
                     </div>

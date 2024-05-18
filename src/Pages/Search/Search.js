@@ -131,12 +131,17 @@ import TourCard from "../../Components/TourCard/TourCard";
 import { colors } from "../../colors";
 import { DataToShowContext } from "../../Contexts/dataToShow";
 import { useFilterContext } from "../../Contexts/filterationContext";
+import { useAuth } from "../../Contexts/authContext ";
+import Swal from "sweetalert2";
 
 const Search = () => {
   const { selectedFilters } = useFilterContext();
   const [tours, setTours] = useState([]);
   const [activeTab, setActiveTab] = useState('Recommended');
   const [filteredTours , setFilteredTours] = useState([]);
+  const { user } = useAuth();
+  // console.log(user.id);
+
 
   useEffect(() => {
     const fetchTours = async () => {
@@ -159,7 +164,6 @@ const Search = () => {
 
       if (selectedFilters.Departs.length > 0) {
         const departsWithCountry = selectedFilters.Departs.map(depart => `${depart}, Egypt`);
-        console.log(departsWithCountry)
         if (!departsWithCountry.map(depart => tour.location.toLowerCase().includes(depart.toLowerCase())).includes(true)) {
           return false;
         }
@@ -179,12 +183,10 @@ const Search = () => {
 
       return true;
     });
-  
-    console.log("Filtered tours:", filteredTours); 
 
     setFilteredTours(filteredTours);
-    console.log(filteredTours)
   }, [selectedFilters, tours]);
+
   
   const handleTabClick = (tab) => {
     let sortedTours = [...tours];
@@ -267,9 +269,16 @@ const Search = () => {
                     </li>
                   </ul>
                 </div>
-                {filteredTours.map((tour, index) => (
-                  <TourCard key={index} tourData={tour} />
-                ))}
+                {filteredTours.length > 0 ? (
+                  filteredTours.map((tour, index) => (
+                    <TourCard key={index} tourData={tour}  />
+                  ))
+                ) : (
+                  tours.map((tour, index) => (
+                    <TourCard key={index} tourData={tour}  />
+                  ))
+                )}
+
               </div>
             </div>
           </div>

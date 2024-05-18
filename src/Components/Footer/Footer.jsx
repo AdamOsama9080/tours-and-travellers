@@ -1,6 +1,9 @@
-import { Typography, Link, Box, useMediaQuery, useTheme } from "@mui/material";
+import { Typography, Box, useMediaQuery, useTheme, Link } from "@mui/material";
 import React from "react";
-import { useTranslation } from "react-i18next"; // Import useTranslation hook
+import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
+// Define LinkElement component here
 const LinkElement = ({ name = "N/A", href = "/" }) => (
   <li
     style={{
@@ -24,10 +27,12 @@ const LinkElement = ({ name = "N/A", href = "/" }) => (
 );
 
 const Footer = () => {
-  const { t } = useTranslation(); // Initialize useTranslation hook
-  let theme = useTheme();
+  const { t } = useTranslation();
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const isMedium = useMediaQuery(theme.breakpoints.down("lg"));
+  const navigate = useNavigate(); // Using useNavigate for navigation
+
   return (
     <Box
       sx={{
@@ -59,32 +64,6 @@ const Footer = () => {
         >
           Trollii
         </Typography>
-        {!isMobile ? (
-          <div
-            style={{
-              width: "256px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
-          >
-            <img
-              alt="facebook logo"
-              src={require("../../Images/Footer/facebook.png")}
-            />
-            <img
-              alt="instagram logo"
-              src={require("../../Images/Footer/instagram.png")}
-            />
-            <img
-              alt="youtube logo"
-              src={require("../../Images/Footer/youtube.png")}
-            />
-            <img
-              alt="twitter logo"
-              src={require("../../Images/Footer/twitter.png")}
-            />
-          </div>
-        ) : null}
       </div>
       <div
         style={{
@@ -117,12 +96,18 @@ const Footer = () => {
             }}
           />
           {[
-            { name: t("footer.about") }, // Use t function for translation
+            { name: t("footer.about"), path: "/AboutUs" },
             { name: t("footer.mobile") }, // Use t function for translation
             { name: t("footer.blog") }, // Use t function for translation
             { name: t("footer.howWeWork") }, // Use t function for translation
-          ].map(({ name, href }, index) => (
-            <LinkElement key={index} name={name} href={href} />
+          ].map(({ name, path }, index) => (
+            <div
+              key={index}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(path)}
+            >
+              {name}
+            </div>
           ))}
         </div>
         <div
@@ -189,11 +174,18 @@ const Footer = () => {
               margin: isMobile ? "17px 39vw 17px 0" : "17px 0",
             }}
           />
-          {[{ name: t("footer.contactUs") }, { name: t("footer.faqs") }].map(
-            ({ name, href }, index) => (
-              <LinkElement key={index} name={name} href={href} />
-            )
-          )}
+          {[
+            { name: t("footer.contactUs"), path: "/ContactUs" },
+            { name: t("footer.faqs"), path: "/Frequentlyaskedquestions" }
+          ].map(({ name, path }, index) => (
+            <div
+              key={index}
+              style={{ cursor: "pointer" }}
+              onClick={() => navigate(path)}
+            >
+              {name}
+            </div>
+          ))}
         </div>
         <div
           style={{
@@ -238,15 +230,14 @@ const Footer = () => {
           }}
         >
           {["facebook", "instagram", "youtube", "twitter"].map((item, index) => {
-  return (
-    <img
-      key={index} // Assigning the index as a unique key
-      alt="social media logos"
-      src={require(`../../Images/Footer/${item}.png`)}
-    />
-  );
-})}
-
+            return (
+              <img
+                key={index} // Assigning the index as a unique key
+                alt="social media logos"
+                src={require(`../../Images/Footer/${item}.png`)}
+              />
+            );
+          })}
         </div>
       ) : null}
     </Box>

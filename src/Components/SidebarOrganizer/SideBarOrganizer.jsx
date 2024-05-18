@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { colors } from "../../colors";
+import { useAuth } from "../../Contexts/authContext ";
 
 export default function SideBarOrganizer() {
+  const navigate = useNavigate();
+  const { logout , user } = useAuth();
 
+
+  const userRole = user.role;
 
   return (
     <>
@@ -66,6 +71,20 @@ export default function SideBarOrganizer() {
                 Profile
               </Link>
             </li>
+
+            {
+              userRole === 'admin' && (
+               <li className="nav-item">
+                  <Link
+                    to="create-organizer"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Create Organizer
+                  </Link>
+                </li> 
+                
+              )
+            }
             <li>
               <Link
                 to="#"

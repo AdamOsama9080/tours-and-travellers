@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "../Home/Home";
 import UserResetLink from "../../Pages/Sign/User/UserResetLink";
@@ -26,77 +26,78 @@ import Finance from "../../Components/FinanceOragnaizer/Finance";
 import { ModalProvider } from "../../Contexts/pypalContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SearchProvider } from "../../Contexts/SearchResultContext";
+import { AuthProvider, useAuth } from "../../Contexts/authContext ";
 import ToursDetailsandBooking from "../../Components/Tours Detailsand information/ToursDetailsandBooking";
 import ContactUs from "../ContactUs/ContactUs";
 import Aboutus from "../AboutUs/Aboutus";
 import Frequentlyaskedquestions from "../Frequentlyaskedquestions/Frequentlyaskedquestions";
 import BookingVisa from "../BookingVisa/BookingVisa";
 import OrderResponse from "../OrderResponse/OrderResponse";
-const getUserRole = () => {
-  const role = localStorage.getItem("role");
-  return role ? role : "";
-};
+import CreateOrganizerEmail from "../../Components/CreateOrganizerEmail/CreateOrganizerEmail";
+
 export default function Test() {
-  const userRole = getUserRole();
+  const [userRole , setUserRole] = useState("")
+  const { user } = useAuth();
+  // console.log(user.role)
+  if(user){
+    console.log(user.role)
+    setUserRole(user.role)
+  }
+  // const getUserRole = () => {
+  //   const role = localStorage.getItem("role");
+  //   return role ? role : "";
+  // };
+
+  // const userRole = getUserRole();
+
   return (
     <GoogleOAuthProvider clientId="46424832078-grv3nhik7b2bii270htb8fots0bnj8ib.apps.googleusercontent.com">
-      <DataToShowProvider>
-        <ModalProvider>
-          <FilterContextProvider>
-            <TourDetailsProvider>
-              <AdultsProvider>
-                <TourDetailsProvider>
-                  <SearchProvider>
+      <AuthProvider>
+        <DataToShowProvider>
+          <ModalProvider>
+            <FilterContextProvider>
+              <TourDetailsProvider>
+                <AdultsProvider>
+                  <TourDetailsProvider>
+                    <SearchProvider>
                       <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/search" element={<Search />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/bookings" element={<Bookings />} />
                         <Route path="/favourites" element={<Favourites />} />
-                        {/* Handle Organize Routing */}
                         <Route path="/resetLinkUser" element={<UserResetLink />} />
-                        <Route
-                          path="/resetPasswordUser"
-                          element={<UserResetPassword />}
-                          />
+                        <Route path="/resetPasswordUser" element={<UserResetPassword />} />
                         <Route path="/signUpUser" element={<UserSignUp />} />
                         <Route path="/signInUser" element={<UserSignIn />} />
-                        <Route
-                          path="/one-time-password"
-                          element={<Onetimepassword />}
-                          />
-                        <Route
-                          path="/otp-forget-password"
-                          element={<OtpForgetpassword />}
-                          />
-                        {userRole === "organizer" && (
+                        <Route path="/one-time-password" element={<Onetimepassword />} />
+                        <Route path="/otp-forget-password" element={<OtpForgetpassword />} />
+                        {userRole === "organizer" || userRole === "admin"  && (
                           <Route path="/organizer" element={<Organize />}>
                             <Route path="dashboard" element={<Dashboard />} />
-                            <Route path="create-tour" element={<CreateTour />} />
-                            <Route
-                              path="update-tour"
-                              element={<UpdateandDeleteTour />}
-                              />
                             <Route path="profile" element={<OrganizerProfile />} />
+                            <Route path="create-tour" element={<CreateTour />} />
+                            <Route path="update-tour" element={<UpdateandDeleteTour />} />
                             <Route path="finance" element={<Finance />} />
+                            <Route path = "create-organizer" element={<CreateOrganizerEmail />} />
                           </Route>
                         )}
-                        {/* <Route path="/tours" element={<ToursDetails />} /> */}
-                        <Route path="/tours/:tourId" element={<ToursDetailsandBooking></ToursDetailsandBooking>}></Route>
-                        <Route path="/ContactUs" element={<ContactUs />}></Route>
-                        <Route path="/AboutUs" element={<Aboutus></Aboutus>}></Route>
-                        <Route path="/Frequentlyaskedquestions" element={<Frequentlyaskedquestions></Frequentlyaskedquestions>}></Route>
-                        <Route path="/BookingVisa" element={<BookingVisa></BookingVisa>}></Route>
-                        <Route path="OrderResponse" element={<OrderResponse></OrderResponse>}></Route>
+                        <Route path="/tours/:tourId" element={<ToursDetailsandBooking />} />
+                        <Route path="/ContactUs" element={<ContactUs />} />
+                        <Route path="/AboutUs" element={<Aboutus />} />
+                        <Route path="/Frequentlyaskedquestions" element={<Frequentlyaskedquestions />} />
+                        <Route path="/BookingVisa" element={<BookingVisa />} />
+                        <Route path="/OrderResponse" element={<OrderResponse />} />
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </SearchProvider>
-                </TourDetailsProvider>
-              </AdultsProvider>
-            </TourDetailsProvider>
-          </FilterContextProvider>
-        </ModalProvider>
-      </DataToShowProvider>
+                  </TourDetailsProvider>
+                </AdultsProvider>
+              </TourDetailsProvider>
+            </FilterContextProvider>
+          </ModalProvider>
+        </DataToShowProvider>
+      </AuthProvider>
     </GoogleOAuthProvider>
   );
 }

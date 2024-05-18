@@ -1,17 +1,4 @@
-import {
-  Box,
-  Button,
-  Drawer,
-  IconButton,
-  Link,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import {Box,Button,Drawer,IconButton,Link,List,ListItem,ListItemButton,ListItemIcon,ListItemText,Toolbar,Typography,} from "@mui/material";
 import Dropdown from "react-bootstrap/Dropdown";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import HighlightOffRoundedIcon from "@mui/icons-material/HighlightOffRounded";
@@ -33,6 +20,7 @@ import { faAngleDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import LanguageToggleButton from "../../Localization/LanguageToggleButton";
 import { colors } from "../../colors";
 import { useTranslation } from "react-i18next"; // Import useTranslation hook
+import { useAuth  } from "../../Contexts/authContext ";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -76,6 +64,8 @@ const styles = {
   },
 };
 const Navbar = (props) => {
+  const { user , logout } = useAuth(); // Access the user object using the useAuth hook
+  console.log(user);
   const [token, setToken] = useState(localStorage.getItem("token"));
   const { t } = useTranslation(); // Use the useTranslation hook
   let navigate = useNavigate();
@@ -87,6 +77,17 @@ const Navbar = (props) => {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const goToProfile = () =>{
+    if(user){
+      navigate("/profile")
+    }
+  }
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -171,7 +172,7 @@ const Navbar = (props) => {
             display: { xs: "none", md: "block", sm: "block" },
           }}
         >
-          {token ? (
+          {user ? (
             <Dropdown>
               <Dropdown.Toggle
                 style={{ backgroundColor: "white" }}
@@ -190,18 +191,16 @@ const Navbar = (props) => {
                   }}
                 >
                   <FontAwesomeIcon icon={faCircleUser} />{" "}
-                  {localStorage.getItem("firstName")}
+                  {/* {localStorage.getItem("firstName")} */}
+                  {user.firstName}
                   <FontAwesomeIcon icon={faAngleDown} />
                 </Typography>{" "}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item href="/profile">Account Settings</Dropdown.Item>
+                <Dropdown.Item onClick={goToProfile}>Account Settings</Dropdown.Item>
                 <Dropdown.Item
-                  href="/"
-                  onClick={() => {
-                    setToken(localStorage.clear());
-                  }}
+                  onClick={handleLogout}
                 >
                   Log out
                 </Dropdown.Item>
@@ -275,7 +274,7 @@ const Navbar = (props) => {
                 Trollii
               </Typography>
 
-              {token ? (
+              {user ? (
                 <Dropdown>
                   <Dropdown.Toggle
                     style={{ backgroundColor: "white" }}

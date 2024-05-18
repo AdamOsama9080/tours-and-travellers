@@ -16,10 +16,12 @@ import checkIcon from "../../Images/icons/checkIcon.png";
 import savedIcon from "../../Images/icons/savedIcon.png";
 import { colors } from "../../colors";
 import axios from "axios";
+import { useAuth } from "../../Contexts/authContext ";
 
 export default function Favourties() {
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const userId = localStorage.getItem("id");
+  const { user } = useAuth(); 
+  console.log(user);
+  console.log(user.id);
   const [cardContent, setCardContent] = useState([
     // {
     //   id: 1,
@@ -58,7 +60,7 @@ export default function Favourties() {
   ]);
   React.useEffect(() => {
     axios
-      .get(`https://apis-2-4nek.onrender.com/favourits/get-favourits/${userId}`)
+      .get(`http://localhost:2000/favourits/get-favourits/${user.id}`)
       .then((response) => {
         setCardContent(response.data || []);
       })
@@ -70,10 +72,10 @@ export default function Favourties() {
   const handleSaveToggle = (id) => {
     try {
       axios.delete(
-        `https://apis-2-4nek.onrender.com/favourits/remove-favourit`,
+        `http://localhost:2000/favourits/remove-favourit`,
         {
           data: {
-            userId: userId,
+            userId: user.id,
             tourId: id,
           },
         }
@@ -90,7 +92,7 @@ export default function Favourties() {
   return (
     <>
       <Navbar />
-      {!token && (
+      {!user && (
         <div
           className="d-flex justify-content-center align-items-center"
           style={{ height: "70vh" }}
@@ -100,7 +102,7 @@ export default function Favourties() {
           </div>
         </div>
       )}
-      {token && (
+      {user && (
         <Box sx={{ padding: 9 }}>
           <h1 className="text-center mb-5" style={{ color: colors.secondary }}>
             Favourites

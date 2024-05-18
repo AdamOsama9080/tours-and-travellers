@@ -22,16 +22,23 @@ import savedIcon from "../../Images/icons/savedIcon.png";
 import cancelledImg from "../../Images/cancelledImg.png";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
+import { useAuth } from "../../Contexts/authContext ";
+import Swal from "sweetalert2";
 export default function Bookings() {
+  const { user } = useAuth(); 
+  console.log(user);
+  console.log(user.id);
   const [value, setValue] = useState(0);
   const [cardContent, setCardContent] = useState([]);
   const currentDate = new Date();
-  const userId = localStorage.getItem("id");
-  console.log(userId);
+  const [savedTours, setSavedTours] = useState([]); 
+
+  // const userId = localStorage.getItem("id");
+  // console.log(userId);
   useEffect(() => {
     console.log("ahhhhh");
     axios
-      .get(`https://apis-2-4nek.onrender.com/booking/${userId}`)
+      .get(`http://localhost:2000/booking/${user.id}`)
       .then((response) => {
         setCardContent(response.data.data || []);
         console.log(response.data);
@@ -41,77 +48,124 @@ export default function Bookings() {
       });
   }, []);
 
-  // const [cardContent, setCardContent] = useState([
-  //   {
-  //     id: 1,
-  //     image: bookingsImage1,
-  //     upcoming: "2",
-  //     discount: null,
-  //     location: "Giza, Egypt",
-  //     title: "Full-Day Tour Giza Great Pyramids, Sphinx, Memphis, And Saqqara",
-  //     date: "08/13/2022",
-  //     travellers: "2",
-  //     payment: "Reserve now pay later",
-  //     pickUpLocation: "I will select my pickup location later",
-  //     freeCancellation:
-  //       "Free Cancellation before 8:00 AM (local time) on Aug 15, 2024",
-  //     price: 155,
-  //     isSaved: false,
-  //     isCancelled: false,
-  //   },
-  //   {
-  //     id: 2,
-  //     image: bookingsImage2,
-  //     upcoming: "8",
-  //     discount: 8,
-  //     location: "Giza, Egypt",
-  //     title: "Full-Day Tour Giza Great Pyramids, Sphinx, Memphis, And Saqqara",
-  //     date: "08/13/2024",
-  //     travellers: "2",
-  //     payment: "Payed by credit card",
-  //     pickUpLocation: "I will select my pickup location later",
-  //     freeCancellation:
-  //       "Free Cancellation before 8:00 AM (local time) on Aug 15, 2022",
-  //     price: 155,
-  //     isSaved: false,
-  //     isCancelled: false,
-  //   },
-  // ]);
+  useEffect(() => {
+    axios
+      .get(`http://localhost:2000/favourits/get-favourits/${user.id}`)
+      .then((response) => {
+        const favoriteTours = response.data.map(favorite => favorite.tour._id);
+        console.log(favoriteTours);
+        setSavedTours(favoriteTours);
+        // console.log(response.data[0].tour._id)
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }, []);
+  console.log(savedTours);
 
+  console.log(cardContent);
+  
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleSaveToggle = (id) => {
-    axios
-      .post(`https://apis-2-4nek.onrender.com/favourits/add-favourit`, {
-        userId: userId,
-        tourId: id,
-      })
-      .then((response) => {
-        console.log("Response:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  };
-
+  
   const handleCancelBooking = (id) => {
-    console.log(id, userId)
-    axios
-      .put(`https://apis-2-4nek.onrender.com/booking/`, {
-        tour: id,
-        user: userId,
-      })
-      .then((response) => {
-        setValue(2);
-        console.log("Response:", response);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, cancel it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .put(`http://localhost:2000/booking`, {
+            tour: id,
+            user: user.id,
+          })
+          .then((response) => {
+            setValue(2);
+            Swal.fire({
+              title: "Canceled!",
+              text: "Your booking has been canceled.",
+              icon: "success"
+            });
+            console.log("Response:", response);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              title: "Error!",
+              text: "Failed to cancel booking. Please try again later.",
+              icon: "error"
+            });
+          });
+        }
       });
-  };
+    };
+    
+    const handleSaveToggle = (id) => {
+      const isSaved = savedTours.includes(id); 
+      
+      // If the tour is already saved, remove it from favorites
+      if (isSaved) {
+        axios
+          .delete(`http://localhost:2000/favourits/remove-favourit`, {
+            data: {
+              userId: user.id,
+              tourId: id,
+            }
+          })
+          .then((response) => {
+            console.log("Response:", response.data);
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Tour removed from favorites successfully.',
+            });
+            // Update the savedTours list to reflect the removal
+            setSavedTours(savedTours.filter(tourId => tourId !== id));
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'An error occurred while removing the tour from favorites.',
+            });
+          });
+      } else {
+        axios
+          .post(`http://localhost:2000/favourits/add-favourit`, {
+            userId: user.id,
+            tourId: id,
+          })
+          .then((response) => {
+            console.log("Response:", response.data);
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Tour added to favorites successfully.',
+            });
+            // Update the savedTours list to reflect the addition
+            setSavedTours([...savedTours, id]);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'An error occurred while adding the tour to favorites.',
+            });
+          });
+      }
+    };
+  
 
+  
   return (
     <>
       <Navbar />
@@ -121,20 +175,17 @@ export default function Bookings() {
           color="default"
           sx={{
             marginBottom: "50px",
-            backgroundColor: "white", // Light gray background
-            borderRadius: "20px", // Rounded corners
+            backgroundColor: "white", 
+            borderRadius: "20px", 
             "& .MuiTabs-root": {
-              // Target the Tabs container
               display: "flex",
-              justifyContent: "center", // Center tabs horizontally
+              justifyContent: "center", 
             },
             "& .MuiTab-root": {
-              // Target individual tabs
-              minWidth: "100px", // Set minimum width for each tab
-              fontWeight: "bold", // Bold font weight
-              color: "#333", // Dark gray text color
+              minWidth: "100px", 
+              fontWeight: "bold",
+              color: "#333", 
               "&.Mui-selected": {
-                // Style the selected tab
                 color: "#5F41B2",
               },
             },
@@ -218,7 +269,7 @@ export default function Bookings() {
                     fontWeight="bold"
                     textAlign="right"
                   >
-                    ${card.tour.price}
+                    ${card.tour.price * card.numOfPeople}
                   </Typography>
                   {!card.isCanceld && (
                     <button
@@ -290,8 +341,7 @@ export default function Bookings() {
                         style={{ marginRight: "5px" }}
                       />
                       <Typography>
-                        Free Cancellation before 8:00 AM (local time) on Aug 15,
-                        2022
+                        Free Cancellation before {card.tour.startTime} (local time) on {card.tour.startDate}
                       </Typography>
                     </div>
                   </CardContent>
@@ -324,17 +374,7 @@ export default function Bookings() {
             </p>
           )}
       </Box>
-      {cardContent.length > 0 ? <Footer/>:<div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          width: "100%",
-          marginTop: "50px"
-        }}
-      >
-        <Footer />
-      </div>}
+      <Footer />
     </>
   );
 }

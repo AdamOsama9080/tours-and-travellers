@@ -1,9 +1,69 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { colors } from '../../colors';
 import Duration from './../MainSideBar/Duration';
+import { useNavigate } from 'react-router-dom'; 
+import Swal from 'sweetalert2';
+import axios from 'axios';
+import { useAuth } from '../../Contexts/authContext ';
 
 export default function TourCard({ tourData }) {
     const [showMore, setShowMore] = useState(false);
+    const [savedTours, setSavedTours] = useState([]);
+    const [isSaved, setIsSaved] = useState(false);
+    const navigate = useNavigate(); 
+    const { user } = useAuth();
+    
+    useEffect(() => {
+        axios
+          .get(`http://localhost:2000/favourits/get-favourits/${user.id}`)
+          .then((response) => {
+            const favoriteTours = response.data.map(favorite => favorite.tour._id);
+            console.log(favoriteTours);
+            setSavedTours(favoriteTours);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+    }, []);
+
+    const handleSaveToggle = async (id) => {
+        try {
+            const isSaved = savedTours.includes(id); 
+            const url = isSaved 
+                ? `http://localhost:2000/favourits/remove-favourit` 
+                : `http://localhost:2000/favourits/add-favourit`;
+
+            const response = await axios.post(url, {
+                userId: user.id,
+                tourId: id,
+            });
+
+            console.log("Response:", response.data);
+
+            if (isSaved) {
+                setSavedTours(savedTours.filter(tourId => tourId !== id));
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Tour removed from favorites successfully.',
+                });
+            } else {
+                setSavedTours([...savedTours, id]);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Tour added to favorites successfully.',
+                });
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `An error occurred while ${isSaved ? 'removing' : 'adding'} the tour to favorites.`,
+            });
+        }
+    };
 
     const toggleShowMore = () => {
         setShowMore(!showMore);
@@ -36,6 +96,8 @@ export default function TourCard({ tourData }) {
 
     const handleSelectTour = (tourId) => {
         console.log("Selected Tour ID:", tourId);
+        const tourDetailsUrl = `/tours/${tourId}`;
+        navigate(tourDetailsUrl);
     };
 
     return (
@@ -87,8 +149,12 @@ export default function TourCard({ tourData }) {
                             </div>
 
                             <div className='col-md-4 d-flex flex-column justify-content-between align-items-center  '>
-                                <div className='fs-1 text-black-50 position-relative p-0 m-0' >
-                                    <i className="bi bi-bookmark-fill position-absolute " style={{ top:'-13px' }}></i>
+                                <div className="fs-1 text-black-50 position-relative p-0 m-0">
+                                    <i
+                                        className={`bi bi-bookmark-fill position-absolute ${savedTours.includes(tourData._id) ? 'text-warning' : ''}`}
+                                        style={{ top: '-13px', cursor: 'pointer' }}
+                                        onClick={() => handleSaveToggle(tourData._id)}
+                                    ></i>
                                 </div>
                                 <div className='m-3'>
 

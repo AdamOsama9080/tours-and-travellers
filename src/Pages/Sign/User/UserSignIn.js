@@ -13,11 +13,27 @@ import SignPhotos from "../SignPhotos";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { GoogleLogin } from "@react-oauth/google";
+import { useAuth } from "../../../Contexts/authContext ";
+import * as Yup from "yup";
 
 export default function UserSignIn() {
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(null);
+  const { login, error } = useAuth();
   const history = useNavigate();
+
+  const handleFormSubmit = async (event) => {
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const response = await login(email, password);
+      console.log("Sign-in response:", response);
+    } catch (error) {
+      console.error("Error signing in:", error);
+    }
+  };
 
   // const token = localStorage.getItem("token");
 
@@ -55,43 +71,6 @@ export default function UserSignIn() {
 
   let theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("lg"));
-
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
-
-    const email = document.getElementById("email").value;
-    const password = document.getElementById("password").value;
-
-    try {
-      const response = await axios.post(
-        "https://apis-2-4nek.onrender.com/auth/login",
-        {
-          email,
-          password,
-        }
-      );
-
-      const { token } = response.data;
-      const decodedToken = jwtDecode(token);
-
-      localStorage.setItem("token", token);
-      localStorage.setItem("role", decodedToken.role);
-      localStorage.setItem("email", decodedToken.email);
-      localStorage.setItem("id", decodedToken.id);
-      localStorage.setItem("firstName", decodedToken.firstName);
-      localStorage.setItem("lastName", decodedToken.lastName);
-
-      if (decodedToken.role === "user") {
-        history("/");
-      } else if (decodedToken.role === "organizer") {
-        history("/organizer/dashboard");
-        return;
-      }
-    } catch (error) {
-      console.error("Error signing in:", error);
-      setError("Invalid email or password. Please try again.");
-    }
-  };
 
   return (
     <Box
@@ -344,18 +323,15 @@ export default function UserSignIn() {
                 console.log(decodedUser.birthday);
 
                 axios
-                  .post(
-                    "https://apis-2-4nek.onrender.com/auth/signinOrSignupWithGoogle",
-                    {
-                      firstName: decodedUser.given_name,
-                      lastName: decodedUser.family_name,
-                      email: decodedUser.email,
-                      password: decodedUser.email + "hashedPassword123",
-                      birthdate: "1990-01-01",
-                      role: "user",
-                      active: decodedUser.email_verified,
-                    }
-                  )
+                  .post("http://localhost:2000/auth/signinOrSignupWithGoogle", {
+                    firstName: decodedUser.given_name,
+                    lastName: decodedUser.family_name,
+                    email: decodedUser.email,
+                    password: decodedUser.email + "hashedPassword123",
+                    birthdate: "1990-01-01",
+                    role: "user",
+                    active: decodedUser.email_verified,
+                  })
                   .then((response) => {
                     let decodedUser = jwtDecode(response.data.token);
                     console.log("Response:", decodedUser);

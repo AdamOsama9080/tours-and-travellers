@@ -2,8 +2,41 @@ import React from 'react'
 import Navbar from '../../Components/Navbar/Navbar'
 import Footer from '../../Components/Footer/Footer'
 import { colors } from '../../colors'
+import { useLocation } from 'react-router-dom';
 
 export default function OrderResponse() {
+    const location = useLocation();
+    const bookingResponse = location.state?.bookingResponse;
+    console.log(bookingResponse);
+
+    if (!bookingResponse) {
+        return <div>Loading...</div>;
+    }
+
+    const renderTravelerNames = () => {
+        return bookingResponse.travelers.map((traveler, index) => (
+            <p key={index} className='fw-bold text-black-50 m-0'>
+                Traveler Name: {traveler['firstname-' + index]} {traveler['lastname-' + index]}
+            </p>
+        ));
+    };
+
+    const formatDateLikeMonDDYYYY = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        return `${day} ${month} ${year}`;
+    };
+    
+    const formatDateLikeDD_MM_YYYY = (dateString) => {
+        const date = new Date(dateString);
+        const day = date.getDate();
+        const month = date.getMonth() + 1; 
+        const year = date.getFullYear();
+        return `${day} - ${month} - ${year}`;
+    };
   return (
     // <div>OrderResponse</div>
     <>
@@ -19,18 +52,18 @@ export default function OrderResponse() {
                             <div className='d-flex align-items-center justify-content-center'>
                             <i class="bi bi-check-circle-fill"style={{color:colors.secondary , fontSize:'4rem'}}></i>
                                 <div className='ms-3'>
-                                    <h3>Your order was submitted successfully!</h3>
-                                    <p className='m-0'>Booking details has been sent to exmaple@gmail.com</p>
+                                    <h3>Your order was submitted and add to cart successfully!</h3>
+                                    <p className='m-0'>Booking details has been sent to {bookingResponse.user.email}</p>
                                 </div>
                             </div>
                         </div>
                         <div className='col-md-4'>
                             <div>
                                 <p className='text-black-50 fw-bold'>
-                                    Booking Number:  <strong className='text-black'>5483</strong>
+                                    Booking Number:  <strong className='text-black'>{bookingResponse.tripCode}</strong>
                                 </p>
                                 <p className='text-black-50 fw-bold'>
-                                    Booking Date:  <strong className='text-black'>Aug20 2022</strong>
+                                    Booking Date:  <strong className='text-black'>{formatDateLikeMonDDYYYY(bookingResponse.tour.startDate)}</strong>
                                 </p>
                                 <p className='text-black-50 fw-bold'>
                                     Payment Method:  <strong className='text-black'>Credit card</strong>
@@ -50,17 +83,17 @@ export default function OrderResponse() {
                                 <img src=''/>
                             </div>
                             <div className='col-md-8'>
-                                <h4 className='' style={{ color: colors.primary }}>Full-Day Tour Giza Great Pyramids,<br></br>Sphinx, Memphis, and saqqara</h4>
-                                <p><i class="bi bi-geo-alt"></i> cairo, Egypt</p>
-                                <p><i class="bi bi-people"></i>4 traveler</p>
+                                <h4 className='' style={{ color: colors.primary }}>{bookingResponse.tour.description}</h4>
+                                <p><i class="bi bi-geo-alt"></i> {bookingResponse.tour.location}</p>
+                                <p><i class="bi bi-people me-2"></i>{bookingResponse.travelers.length} traveler</p>
                                 <div className='d-flex align-items-center'>
-                                    <p><i class="bi bi-clock"></i> 3 Days</p>
-                                    <p><i class="bi bi-calendar-event"></i>08/13/2022</p>
+                                    <p><i class="bi bi-clock me-2"></i>{bookingResponse.tour.duration}</p>
+                                    <p><i class="bi bi-calendar-event mx-2"></i>{formatDateLikeMonDDYYYY(bookingResponse.tour.startDate)}</p>
                                 </div>
 
                                 <div className='d-flex align-items-center'>
                                     <i class="bi bi-check-lg fw-bold me-1 fs-5" style={{ color: colors.secondary, fontWeight: 'bold' }}></i>
-                                    <p className='m-0'>Free cancellation before 8:00 AM <br></br>(local time) on Aug 15, 2022</p>
+                                    <p className='m-0'>Free cancellation before {bookingResponse.tour.startTime} <br></br>(local time) on {formatDateLikeDD_MM_YYYY(bookingResponse.tour.startDate)}</p>
                                 </div>
                             </div>
 
@@ -68,8 +101,7 @@ export default function OrderResponse() {
                             <hr></hr>
                             <div>
                                 <h4>Travellers</h4>
-                                <p className='fw-bold text-black-50 m-0'>traveler Name</p>
-                                <p className='fw-bold text-black-50 m-0'>traveler Name</p>
+                                {renderTravelerNames()}
                             </div>
                             <hr></hr>
                             <div>
@@ -93,20 +125,20 @@ export default function OrderResponse() {
                     <div className='card-body'>
                         <div className='d-flex align-items-center justify-content-between'>
                             <p className='fw-bold fs-5 text-black-50'>Adult Price</p>
-                            <p className='fw-bold fs-5 '>500 EGY</p>
+                            <p className='fw-bold fs-5 '>{bookingResponse.tour.price} EGY</p>
                         </div>
                         <div className='d-flex align-items-center justify-content-between'>
                             <p className='fw-bold fs-5 text-black-50'>Discount</p>
-                            <p className='fw-bold fs-5 '>50% </p>
+                            <p className='fw-bold fs-5 '>0% </p>
                         </div>
                         <div className='d-flex align-items-center justify-content-between'>
                             <p className='fw-bold fs-5 text-black-50'>Tax</p>
-                            <p className='fw-bold fs-5 '>500 EGY</p>
+                            <p className='fw-bold fs-5 '>0 EGY</p>
                         </div>
                         <hr></hr>
                         <div className='d-flex align-items-center justify-content-between'>
                             <p className='fw-bold fs-5 text-black-50 m-0'>Total</p>
-                            <p className='fw-bold fs-5 m-0 fs-4 ' style={{ color: colors.secondary }}>500 EGY</p>
+                            <p className='fw-bold fs-5 m-0 fs-4 ' style={{ color: colors.secondary }}>{bookingResponse.tour.price} EGY</p>
                         </div>
                     </div>
                 </div>

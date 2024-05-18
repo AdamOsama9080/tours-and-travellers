@@ -48,7 +48,7 @@ export default function UserResetPassword() {
       const email = new URLSearchParams(window.location.search).get("email");
 
       const response = await axios.post(
-        "https://apis-2-4nek.onrender.com/auth/reset-password",
+        "http://localhost:2000/auth/reset-password",
         { email, newPassword: password }
       );
 

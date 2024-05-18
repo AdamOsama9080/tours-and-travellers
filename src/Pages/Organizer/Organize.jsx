@@ -25,6 +25,7 @@ export default function Organize() {
             element={<OrganizerProfile></OrganizerProfile>}
           ></Route>
           <Route path="/finance" element={<Finance></Finance>}></Route>
+          {/* <Route path="/create-organizer" element={<} */}
         </Routes>
       </div>
     </div>

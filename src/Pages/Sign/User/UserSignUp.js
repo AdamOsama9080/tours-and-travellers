@@ -1,20 +1,15 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Divider,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import {Box,Button,Checkbox,Divider,Typography,useMediaQuery,useTheme,} 
+from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import SignPhotos from "../SignPhotos";
 import * as Yup from "yup";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { GoogleLogin } from "@react-oauth/google";
-// import './UserSignUp.css'; // Import CSS file for custom styling
+// import { navigate } from "react-router-dom";
+
+
 
 export default function UserSignUp() {
   const [formData, setFormData] = useState({
@@ -25,15 +20,8 @@ export default function UserSignUp() {
     lastname: "",
     birthdate: "",
   });
+
   const [errors, setErrors] = useState({});
-  const errorMessages = {
-    email: "Invalid email address",
-    password: "Password is required",
-    confirmPassword: "Passwords must match",
-    firstname: "First name is required and must be at least 3 characters",
-    lastname: "Last name is required and must be at least 3 characters",
-    birthdate: "Invalid date",
-  };
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -46,38 +34,38 @@ export default function UserSignUp() {
   const navigate = useNavigate();
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+  
     try {
       await validationSchema.validate(formData, { abortEarly: false });
-      const response = await fetch(
-        "https://apis-2-4nek.onrender.com/register/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            firstName: formData.firstname,
-            lastName: formData.lastname,
-            email: formData.email,
-            password: formData.password,
-            birthdate: formData.birthdate,
-          }),
-        }
-      );
-
+  
+      const response = await axios.post("http://localhost:2000/register/Signup", {
+        firstName: formData.firstname,
+        lastName: formData.lastname,
+        email: formData.email,
+        password: formData.password,
+        birthdate: formData.birthdate,
+      });
+  
+      console.log("Registration successful");
+      console.log("Before navigation");
+      navigate(`/one-time-password?email=${encodeURIComponent(formData.email)}`);
+      console.log("After navigation");      
+      setErrors({});
       if (!response.ok) {
         throw new Error("Registration failed");
       }
-
-      console.log("Registration successful");
-      navigate(
-        `/one-time-password?email=${encodeURIComponent(formData.email)}`
-      );
-      setErrors({});
+  
     } catch (error) {
       console.error("Registration error:", error.message);
-      setErrors({ server: "Registration failed. Please try again later." });
+      if (error instanceof Yup.ValidationError) {
+        const yupErrors = {};
+        error.inner.forEach((err) => {
+          yupErrors[err.path] = err.message;
+        });
+        setErrors(yupErrors);
+      } else {
+        setErrors({ server: "Registration failed. Please try again later." });
+      }
     }
   };
 
@@ -88,9 +76,7 @@ export default function UserSignUp() {
       .oneOf([Yup.ref("password"), null], "Passwords must match")
       .required("Required"),
     firstname: Yup.string().required("Required"),
-    lastname: Yup.string()
-      .required("Required")
-      .min(3, "Must be at least 3 characters"),
+    lastname: Yup.string().required("Required").min(3, "Must be at least 3 characters"),
     birthdate: Yup.date()
       .required("Required")
       .min(new Date("1900-01-01"), "Invalid date")
@@ -102,9 +88,19 @@ export default function UserSignUp() {
   };
 
   const history = useNavigate();
+
   const handleLogIn = (event) => {
     event.preventDefault();
     history("/signInUser");
+  };
+
+  const errorMessages = {
+    email: "Invalid email address",
+    password: "Password is required",
+    confirmPassword: "Passwords must match",
+    firstname: "First name is required and must be at least 3 characters",
+    lastname: "Last name is required and must be at least 3 characters",
+    birthdate: "Invalid date",
   };
 
   let theme = useTheme();
@@ -191,149 +187,165 @@ export default function UserSignUp() {
           >
             Create an account
           </Typography>
-          <div>
-            {Object.keys(errors).length > 0 && (
-              <div>
-                {Object.entries(errors).map(([key, value]) => (
-                  <div key={key} class="alert alert-danger" role="alert">
-                    {errorMessages[key]}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
           <form className="form" onSubmit={handleSubmit}>
-            <div>
-              <div className="mb-3">
-                <label htmlFor="firstname" className="form-label fs-5 fw-bold ">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  className="form-control p-3 fs-6 fw-bold"
-                  id="firstname"
-                  placeholder="First Name..."
-                  name="firstname"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="lastname" className="form-label fs-5 fw-bold">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  className="form-control p-3 fs-6 fw-bold"
-                  id="lastname"
-                  placeholder="Last Name..."
-                  name="lastname"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="email" className="form-label fs-5 fw-bold">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  className="form-control p-3 fs-6 fw-bold"
-                  id="email"
-                  placeholder="Write your email..."
-                  name="email"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="birthdate" className="form-label fs-5 fw-bold">
-                  Birthdate
-                </label>
-                <input
-                  type="date"
-                  className="form-control p-3 fs-6 fw-bold"
-                  id="birthdate"
-                  name="birthdate"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="password" className="form-label fs-5 fw-bold">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  className="form-control y p-3 fs-6 fw-bold"
-                  id="password"
-                  placeholder="Password..."
-                  name="password"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="mb-3">
-                <label
-                  htmlFor="confirmPassword"
-                  className="form-label fs-5 fw-bold"
-                >
-                  Confirm Password
-                </label>
-                <input
-                  type="Password"
-                  className="form-control p-3 fs-6 fw-bold"
-                  id="confirmPassword"
-                  placeholder="confirmPassword..."
-                  name="confirmPassword"
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "start",
-                marginTop: "0.4375em",
-              }}
-            >
-              <Checkbox
-                id="confirm-privacy-policy"
-                sx={{
-                  width: "1.125em",
-                  height: "1.125em",
-                  marginRight: "0.6875em",
-                  marginTop: "1px",
-                }}
-              />
-              <label
-                htmlFor="confirm-privacy-policy"
-                style={{
-                  color: "#5D5C66",
-                  fontFamily: "Roboto",
-                  fontSize: "0.875rem",
-                  lineHeight: "140%",
-                  margin: "0",
-                  textAlign: "left",
-                }}
-              >
-                I confirm that I have read and accepted the{" "}
-                <span style={{ color: "#5F41B2" }}>privacy policy</span>
-              </label>
-            </Box>
-            <button
-              type="submit"
-              className="btn col-md-12"
-              style={{
-                width: "100%",
-                height: "3em",
-                borderRadius: "0.9375em",
-                backgroundColor: "#5F41B2",
-                color: "#FFFFFF",
-                fontFamily: "Roboto",
-                fontSize: "1rem",
-                textTransform: "none",
-                margin: "2em 0",
-              }}
-            >
-              Sign up
-            </button>
-          </form>
+      <div>
+        <div className="mb-3">
+          <label htmlFor="firstname" className="form-label fs-5 fw-bold">
+            First Name
+          </label>
+          <input
+            type="text"
+            className="form-control p-3 fs-6 fw-bold"
+            id="firstname"
+            placeholder="First Name..."
+            name="firstname"
+            value={formData.firstname}
+            onChange={handleChange}
+          />
+          {/* Display error message for first name */}
+          {errors.firstname && (
+            <p className="text-danger">{errorMessages.firstname}</p>
+          )}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="lastname" className="form-label fs-5 fw-bold">
+            Last Name
+          </label>
+          <input
+            type="text"
+            className="form-control p-3 fs-6 fw-bold"
+            id="lastname"
+            placeholder="Last Name..."
+            name="lastname"
+            value={formData.lastname}
+            onChange={handleChange}
+          />
+          {/* Display error message for last name */}
+          {errors.lastname && (
+            <p className="text-danger">{errorMessages.lastname}</p>
+          )}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="email" className="form-label fs-5 fw-bold">
+            Email Address
+          </label>
+          <input
+            type="email"
+            className="form-control p-3 fs-6 fw-bold"
+            id="email"
+            placeholder="Write your email..."
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          {/* Display error message for email */}
+          {errors.email && (
+            <p className="text-danger">{errorMessages.email}</p>
+          )}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="birthdate" className="form-label fs-5 fw-bold">
+            Birthdate
+          </label>
+          <input
+            type="date"
+            className="form-control p-3 fs-6 fw-bold"
+            id="birthdate"
+            name="birthdate"
+            value={formData.birthdate}
+            onChange={handleChange}
+          />
+          {/* Display error message for birthdate */}
+          {errors.birthdate && (
+            <p className="text-danger">{errorMessages.birthdate}</p>
+          )}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="password" className="form-label fs-5 fw-bold">
+            Password
+          </label>
+          <input
+            type="password"
+            className="form-control y p-3 fs-6 fw-bold"
+            id="password"
+            placeholder="Password..."
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          {/* Display error message for password */}
+          {errors.password && (
+            <p className="text-danger">{errorMessages.password}</p>
+          )}
+        </div>
+        <div className="mb-3">
+          <label htmlFor="confirmPassword" className="form-label fs-5 fw-bold">
+            Confirm Password
+          </label>
+          <input
+            type="password"
+            className="form-control p-3 fs-6 fw-bold"
+            id="confirmPassword"
+            placeholder="Confirm Password..."
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+          />
+          {/* Display error message for confirm password */}
+          {errors.confirmPassword && (
+            <p className="text-danger">{errorMessages.confirmPassword}</p>
+          )}
+        </div>
+      </div>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "start",
+          marginTop: "0.4375em",
+        }}
+      >
+        <Checkbox
+          id="confirm-privacy-policy"
+          sx={{
+            width: "1.125em",
+            height: "1.125em",
+            marginRight: "0.6875em",
+            marginTop: "1px",
+          }}
+        />
+        <label
+          htmlFor="confirm-privacy-policy"
+          style={{
+            color: "#5D5C66",
+            fontFamily: "Roboto",
+            fontSize: "0.875rem",
+            lineHeight: "140%",
+            margin: "0",
+            textAlign: "left",
+          }}
+        >
+          I confirm that I have read and accepted the{" "}
+          <span style={{ color: "#5F41B2" }}>privacy policy</span>
+        </label>
+      </Box>
+      <button
+        type="submit"
+        className="btn col-md-12"
+        style={{
+          width: "100%",
+          height: "3em",
+          borderRadius: "0.9375em",
+          backgroundColor: "#5F41B2",
+          color: "#FFFFFF",
+          fontFamily: "Roboto",
+          fontSize: "1rem",
+          textTransform: "none",
+          margin: "2em 0",
+        }}
+      >
+        Sign up
+      </button>
+    </form>
           <Divider
             sx={{
               fontFamily: "Roboto",
@@ -354,7 +366,7 @@ export default function UserSignUp() {
 
                 axios
                   .post(
-                    "https://apis-2-4nek.onrender.com/auth/signinOrSignupWithGoogle",
+                    "http://localhost:2000/auth/signinOrSignupWithGoogle",
                     {
                       firstName: decodedUser.given_name,
                       lastName: decodedUser.family_name,

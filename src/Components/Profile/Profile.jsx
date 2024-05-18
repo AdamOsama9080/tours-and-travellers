@@ -1,14 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Profile.modules.css";
 import { useTranslation } from "react-i18next";
 import LanguageToggleButton from "../../Localization/LanguageToggleButton";
 import { colors } from "../../colors";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
-
+import { useAuth } from "../../Contexts/authContext ";
+import  axios  from 'axios';
+import Swal from "sweetalert2";
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const [openCard, setOpenCard] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const { user } = useAuth();
+  const [updatedUser, setUpdatedUser] = useState({ ...user });
+  const [previewImage, setPreviewImage] = useState(null);
+  const [profilePicture , setProfilePicture] = useState(null);
+
+  // useEffect(() => {
+  //   const fetchProfilePicture =  () => {
+  //     try {
+  //       const response =  axios.post(`http://localhost:2000/register/profile`, { email: user.email });
+  //       if (response.data && response.data.profilePicture) {
+  //         setProfilePicture(response.data.profilePicture);
+  //       } else {
+  //         console.error("Profile picture not found in server response:", response);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching profile picture:", error);
+  //     }
+  //   };
+  
+  //   fetchProfilePicture();
+  // }, [user.email]);
+
+  console.log(user.email)
+  
 
   const handleToggle = (cardName) => {
     if (openCard === cardName) {
@@ -17,6 +44,121 @@ const Profile = () => {
       setOpenCard(cardName);
     }
   };
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedUser({ ...updatedUser, [name]: value });
+  };
+
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    setUpdatedUser({ ...updatedUser, profilePictureFile: file }); // Store the file itself
+    const reader = new FileReader();
+    reader.onloadend = () => {
+        setPreviewImage(reader.result); // Optionally, set a preview image
+    };
+    reader.readAsDataURL(file);
+};
+
+
+  const handleEdit = () => {
+    setIsEditing(true);
+  };
+
+  // const handleUpdate = async () => {
+  //   try {
+  //     const updatedUserData = {
+  //       email: updatedUser.email,
+  //       firstName: updatedUser.firstName,
+  //       lastName: updatedUser.lastName,
+  //       phone: updatedUser.phone,
+  //       gender: updatedUser.gender
+  //     };
+  
+  //     if (updatedUser.profilePicture) {
+  //       if (typeof updatedUser.profilePicture === 'string') {
+  //         const base64Image = updatedUser.profilePicture;
+  //         const mimeType = base64Image.split(';')[0].split(':')[1];
+  //         const blob = await fetch(base64Image).then((res) => res.blob());
+  //         updatedUserData.profilePicture = new File([blob], 'profilePicture', { type: mimeType });
+  //       } else {
+  //         updatedUserData.profilePicture = updatedUser.profilePicture;
+  //       }
+  //     }
+  //     console.log(updatedUserData.profilePicture);
+  //     console.log(updatedUserData);
+  
+  //     const response = await axios.post('http://localhost:2000/register/update-profile', updatedUserData);
+  //     console.log(response.data);
+  
+  //     if (response.status === 200) {
+  //       Swal.fire({
+  //         position: 'top-end',
+  //         icon: 'success',
+  //         title: 'Profile updated successfully',
+  //         showConfirmButton: false,
+  //         timer: 1500
+  //       });
+  //       setIsEditing(false);
+  //       console.log("Updated user data:", updatedUserData);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error updating profile:", error);
+  //     Swal.fire({
+  //       title: "Error!",
+  //       text: "Failed to update profile. Please try again later.",
+  //       icon: "error"
+  //     });
+  //   }
+  // };
+
+  const handleUpdate = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('email', updatedUser.email);
+      formData.append('firstName', updatedUser.firstName);
+      formData.append('lastName', updatedUser.lastName);
+      formData.append('phone', updatedUser.phone);
+      formData.append('gender', updatedUser.gender);
+      formData.append('profilePicture', updatedUser.profilePictureFile); // Append profile picture file
+      
+      console.log(formData);
+  
+      const response = await axios.post('http://localhost:2000/register/update-profile', formData);
+      console.log(response.data);
+  
+      if (response.status === 200) {
+        Swal.fire({
+          position: 'top-end',
+          icon: 'success',
+          title: 'Profile updated successfully',
+          showConfirmButton: false,
+          timer: 1500
+        });
+        setIsEditing(false);
+        console.log("Updated user data:", updatedUser);
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Swal.fire({
+        title: "Error!",
+        text: "Failed to update profile. Please try again later.",
+        icon: "error"
+      });
+    }
+  };  
+  
+  useEffect(() => {
+    // console.log("Updated user state:", updatedUser);
+    const pictureOfUesr = axios.post('http://localhost:2000/register/profile',{
+
+    })
+  }, []);
+
 
   return (
     <>
@@ -122,77 +264,122 @@ const Profile = () => {
             </div>
           </div>
           {openCard === "personal" && (
-            <div className="col-md-8 col-sm-12">
-              <div className="card shadow">
-                <div className="card-body p-3">
-                  <div className="mb-2">
-                    <h5
-                      className="card-title fs-3"
-                      style={{ color: colors.secondary }}
-                    >
-                      {t("profile.personalDetails")}
-                    </h5>
-                  </div>
-                  <p>{t("profile.updateYourInfo")}</p>
-                  <div className="mt-4 mb-4">
-                    <p
-                      className="card-title"
-                      style={{ color: colors.secondary }}
-                    ></p>
-                  </div>
-                  <div className="mt-4 mb-4">
-                    <p className="card-title ">
-                      <img
-                        src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
-                        className="rounded-circle text-center me-3 img-fluid"
-                        alt="Profile img .... "
-                        style={{ height: "80px", width: "80px" }}
-                      />
-                      {t("profile.changeProfilePicture")}
-                    </p>
-                  </div>
+   <div className="col-md-8 col-sm-12">
+   <div className="card shadow">
+     <div className="card-body p-3">
+       <div className="mb-2">
+         <h5 className="card-title fs-3" style={{ color: colors.secondary }}>
+           {t("profile.personalDetails")}
+         </h5>
+       </div>
+       <p>{t("profile.updateYourInfo")}</p>
+       <div className="mt-4 mb-4">
+         <p className="card-title" style={{ color: colors.secondary }}></p>
+       </div>
+       <div className="mt-4 mb-4">
+         <p className="card-title ">
+           <img
+             src={previewImage || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+             className="rounded-circle text-center me-3 img-fluid"
+             alt="Profile img .... "
+             style={{ height: "80px", width: "80px" }}
+           />
+           {t("profile.changeProfilePicture")}
+         </p>
+         <input
+           type="file"
+           accept="image/*"
+           onChange={handleProfilePictureChange}
+           disabled={!isEditing}
+         />
+       </div>
 
-                  <div className="input-group row">
-                    <label htmlFor="firstname" className="d-block mt-3">
-                      {t("profile.firstName")}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      placeholder="firstname"
-                      aria-label="firstname"
-                      aria-describedby="addon-wrapping"
-                      disabled
-                      value={localStorage.getItem("firstName")}
-                    />
-                    <label htmlFor="Lastname" className="d-block mt-3">
-                      {t("profile.lastName")}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      placeholder="Lastname"
-                      aria-label="Lastname"
-                      aria-describedby="addon-wrapping"
-                      disabled
-                      value={localStorage.getItem("lastName")}
-                    />
-                    <label htmlFor="email" className="d-block mt-3">
-                      {t("profile.email")}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control text-center"
-                      placeholder="email"
-                      aria-label="email"
-                      aria-describedby="addon-wrapping"
-                      disabled
-                      value={localStorage.getItem("email")}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+       <div className="input-group row">
+         <label htmlFor="firstname" className="d-block mt-3">
+           {t("profile.firstName")}
+         </label>
+         <input
+           type="text"
+           className="form-control text-center"
+           placeholder="firstname"
+           aria-label="firstname"
+           aria-describedby="addon-wrapping"
+           disabled={!isEditing}
+           value={updatedUser.firstName}
+           onChange={handleChange}
+           name="firstName"
+         />
+          <label htmlFor="lastname" className="d-block mt-3">
+            {t("profile.lastName")}
+          </label>
+          <input
+            type="text"
+            className="form-control text-center"
+            placeholder="Lastname"
+            aria-label="Lastname"
+            aria-describedby="addon-wrapping"
+            disabled={!isEditing}
+            value={updatedUser.lastName}
+            onChange={handleChange}
+            name="lastName"
+          />
+          <label htmlFor="email" className="d-block mt-3">
+            {t("profile.email")}
+          </label>
+          <input
+            type="text"
+            className="form-control text-center"
+            placeholder="email"
+            aria-label="email"
+            aria-describedby="addon-wrapping"
+            disabled
+            value={updatedUser.email}
+          />
+          <label htmlFor="phone" className="d-block mt-3">
+            {t("profile.phone")}
+          </label>
+          <input
+            type="number"
+            className="form-control text-center rounded-4"
+            placeholder="phone"
+            aria-label="phone"
+            aria-describedby="addon-wrapping"
+            disabled={!isEditing}
+            value={updatedUser.phone}
+            onChange={handleChange}
+            name="phone"
+          />
+          <label htmlFor="gender" className="d-block mt-3">
+            {t("profile.gender")}
+          </label>
+          <select
+            className="form-control text-center"
+            id="gender"
+            disabled={!isEditing}
+            value={updatedUser.gender}
+            onChange={handleChange}
+            name="gender"
+          >
+            <option value="other">Other</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+        <div className="mt-4 mb-4">
+            {isEditing ? (
+              <button className="btn btn-primary ms-5" onClick={handleUpdate}>
+                Update
+              </button>
+            ) : (
+              <button className="btn btn-success" onClick={handleEdit}>
+                Edit
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+
           )}
 
           {openCard === "security" && (
@@ -353,9 +540,9 @@ const Profile = () => {
         </div>
       </div>
 
-      <div style={{ position: "absolute", bottom: "0", width: "100%" }}>
+      {/* <div style={{ position: "absolute", bottom: "0", width: "100%" }}>
+      </div> */}
         <Footer></Footer>
-      </div>
     </>
   );
 };

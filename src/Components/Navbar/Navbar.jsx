@@ -19,8 +19,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDown, faCircleUser } from "@fortawesome/free-solid-svg-icons";
 import LanguageToggleButton from "../../Localization/LanguageToggleButton";
 import { colors } from "../../colors";
-import { useTranslation } from "react-i18next"; // Import useTranslation hook
+import { useTranslation } from "react-i18next";
 import { useAuth  } from "../../Contexts/authContext ";
+import { jwtDecode } from "jwt-decode";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -40,7 +41,6 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: "flex-start",
   color: "white",
@@ -64,12 +64,23 @@ const styles = {
   },
 };
 const Navbar = (props) => {
-  const { user , logout } = useAuth(); // Access the user object using the useAuth hook
-  console.log(user);
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const { t } = useTranslation(); // Use the useTranslation hook
-  let navigate = useNavigate();
-  const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  
+  const token = localStorage.getItem("token");
+  let user = null;
+  let userRole = "";
+
+  if (token) {
+    try {
+      user = jwtDecode(token);
+      userRole = user.role;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      localStorage.removeItem("token");
+    }
+  }
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -79,14 +90,20 @@ const Navbar = (props) => {
     setOpen(false);
   };
 
-  const goToProfile = () =>{
-    if(user){
-      navigate("/profile")
+  const goToProfile = () => {
+    if (user) {
+      navigate("/profile");
+    }
+  };
+
+  const goTODashboard = () => {
+    if(userRole === "organizer" || userRole === "admin") {
+      navigate("/organizer/dashboard");
     }
   }
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("token");
     navigate("/");
   };
 
@@ -191,19 +208,17 @@ const Navbar = (props) => {
                   }}
                 >
                   <FontAwesomeIcon icon={faCircleUser} />{" "}
-                  {/* {localStorage.getItem("firstName")} */}
                   {user.firstName}
                   <FontAwesomeIcon icon={faAngleDown} />
                 </Typography>{" "}
               </Dropdown.Toggle>
 
               <Dropdown.Menu>
-                <Dropdown.Item onClick={goToProfile}>Account Settings</Dropdown.Item>
-                <Dropdown.Item
-                  onClick={handleLogout}
-                >
-                  Log out
-                </Dropdown.Item>
+                
+                {
+                  userRole === "organizer" || userRole === "admin" ? <Dropdown.Item onClick={goTODashboard}>Dashboard</Dropdown.Item> : <Dropdown.Item onClick={goToProfile}>Profile</Dropdown.Item>
+                }
+                <Dropdown.Item onClick={handleLogout}>Log out</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
@@ -308,13 +323,26 @@ const Navbar = (props) => {
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
-                    <Dropdown.Item href="/profile">
+                    {/* <Dropdown.Item href="/profile">
                       Account Settings
-                    </Dropdown.Item>
+                    </Dropdown.Item> */}
+                    {userRole === "organizer" || userRole === "admin" ? (
+                      <Dropdown.Item onClick={goTODashboard}>
+                        Dashboard
+                      </Dropdown.Item>
+                    ) : (
+                      <Dropdown.Item onClick={goToProfile}>Profile</Dropdown.Item>
+                      
+                    )}
                     <Dropdown.Item
-                      href="#/logged out"
+                      // href="#/logged out"
+
                       onClick={() => {
-                        setToken(localStorage.removeItem("token"));
+                        // setToken(localStorage.removeItem("token"));
+                        localStorage.removeItem("token");
+                        // localStorage.removeItem("firstName");
+                        navigate("/signInUser");
+
                       }}
                     >
                       Log out
@@ -383,7 +411,8 @@ const Navbar = (props) => {
                         alt="logout icon"
                         src={require("../../Images/Navbar/logout.png")}
                         onClick={() => {
-                          setToken(localStorage.removeItem("token"));
+                          // setToken(localStorage.removeItem("token"));
+                          localStorage.removeItem("token");
                           setOpen(false);
                         }}
                       />

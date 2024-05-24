@@ -4,7 +4,10 @@ import PieChart from "../../Components/PieChart/PieChart";
 import ColumnChart from "../../Components/ColumnChart/ColumnChart";
 import SplineChart from "../../Components/SplineChart/SplineChart";
 import SideBarOrganizer from "../../Components/SidebarOrganizer/SideBarOrganizer";
+import { jwtDecode } from "jwt-decode";
+
 export default function Dashboard() {
+  const user = jwtDecode(localStorage.getItem("token"));
 
   return (
     <>
@@ -12,7 +15,7 @@ export default function Dashboard() {
       <div className="col-md-9">
           <div className='row'>
         <div className='col-md-12 my-4 ms-2' style={{textAlign:"left"}}>
-          <h1 className='fs-1 fw-bold' style={{color: colors.secondary}}>Good Morning,<span>{localStorage.getItem("firstName")}</span>! </h1>
+          <h1 className='fs-1 fw-bold' style={{color: colors.secondary}}>Good Morning,<span>{user.firstName}</span>! </h1>
           <p className='fw-bold mt-2 text-black fs-5 '>let's set up your website</p>
          </div>
 

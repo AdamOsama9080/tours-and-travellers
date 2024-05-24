@@ -131,16 +131,15 @@ import TourCard from "../../Components/TourCard/TourCard";
 import { colors } from "../../colors";
 import { DataToShowContext } from "../../Contexts/dataToShow";
 import { useFilterContext } from "../../Contexts/filterationContext";
-import { useAuth } from "../../Contexts/authContext ";
 import Swal from "sweetalert2";
+import {jwtDecode} from "jwt-decode";
 
 const Search = () => {
   const { selectedFilters } = useFilterContext();
   const [tours, setTours] = useState([]);
   const [activeTab, setActiveTab] = useState('Recommended');
   const [filteredTours , setFilteredTours] = useState([]);
-  const { user } = useAuth();
-  // console.log(user.id);
+  const user = jwtDecode(localStorage.getItem("token"));
 
 
   useEffect(() => {

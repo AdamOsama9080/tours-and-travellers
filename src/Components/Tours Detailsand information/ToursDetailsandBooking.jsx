@@ -6,7 +6,7 @@ import { Rating } from '@mui/material';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { useAuth } from "../../Contexts/authContext ";
+import { jwtDecode } from 'jwt-decode';
 
 
 export default function ToursDetailsandBooking() {
@@ -36,7 +36,7 @@ export default function ToursDetailsandBooking() {
         transportationRating: 0
     });
 
-    const {user} = useAuth();
+    const user = jwtDecode(localStorage.getItem('token'));
     console.log(user.id);
     
     const navigate = useNavigate();

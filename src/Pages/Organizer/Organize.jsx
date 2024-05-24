@@ -6,6 +6,10 @@ import CreateTour from "../../Components/CreateTour/CreateTour";
 import UpdateandDeleteTour from "../../Components/UpdateandDeleteTour/UpdateandDeleteTour";
 import OrganizerProfile from "../../Components/organizerProfile/OrganizerProfile";
 import Finance from "../../Components/FinanceOragnaizer/Finance";
+import CreateOrganizerEmail from "../../Components/CreateOrganizerEmail/CreateOrganizerEmail";
+import Discounts from "../../Components/Discounts/Discounts";
+import OrganzierCustomService from "../../Components/OrganizerCostoumService/OrganzierCustomService";
+import OrganizerAcrivation from "../../Components/Organizer Ativation/OrganizerAcrivation";
 
 export default function Organize() {
   return (
@@ -16,16 +20,14 @@ export default function Organize() {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/create-tour" element={<CreateTour></CreateTour>} />
-          <Route
-            path="/update-tour"
-            element={<UpdateandDeleteTour></UpdateandDeleteTour>}
-          ></Route>
-          <Route
-            path="/profile"
-            element={<OrganizerProfile></OrganizerProfile>}
-          ></Route>
+          <Route path="/update-tour" element={<UpdateandDeleteTour></UpdateandDeleteTour>}></Route>
+          <Route path="/profile" element={<OrganizerProfile></OrganizerProfile>}></Route>
           <Route path="/finance" element={<Finance></Finance>}></Route>
-          {/* <Route path="/create-organizer" element={<} */}
+          <Route path="/create-organizer" element={<CreateOrganizerEmail></CreateOrganizerEmail>}></Route>
+          <Route path="/disscount" element={<Discounts></Discounts>}></Route>
+          {/* <Route path="/organize-tours" element={<OrganzierCustomService></OrganzierCustomService>}></Route> */}
+          <Route path="/organizer-Activation" element={<OrganizerAcrivation></OrganizerAcrivation>}></Route>
+          <Route path="/custom-service" element={<OrganzierCustomService></OrganzierCustomService>}></Route>
         </Routes>
       </div>
     </div>

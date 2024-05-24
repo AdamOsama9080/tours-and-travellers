@@ -13,6 +13,7 @@ const Finance = () => {
   const [expenses, setExpenses] = useState('');
   const [profit, setProfit] = useState('');
 
+
   const calculateProfit = () => {
     const income = parseFloat(pricePerTravel) * parseFloat(totalTravelers);
     const netProfit = income - parseFloat(expenses);
@@ -27,7 +28,7 @@ const Finance = () => {
     if (!isLoading) {
       setIsLoading(true);
       try {
-        const response = await axios.get('https://apis-2-4nek.onrender.com/tours/tours');
+        const response = await axios.get('http://localhost:2000/tours/tours');
         const tourData = response.data.data;
         const sortedTourData = tourData.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         const calculatedDataPoints = calculateProfits(sortedTourData);

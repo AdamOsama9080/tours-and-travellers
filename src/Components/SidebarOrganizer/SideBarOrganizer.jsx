@@ -1,14 +1,33 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { colors } from "../../colors";
+import {jwtDecode} from "jwt-decode";
 import { useAuth } from "../../Contexts/authContext ";
 
 export default function SideBarOrganizer() {
   const navigate = useNavigate();
-  const { logout , user } = useAuth();
+  const { logout } = useAuth();
 
+  const token = localStorage.getItem("token");
+  let user = null;
+  let userRole = "";
 
-  const userRole = user.role;
+  if (token) {
+    try {
+      user = jwtDecode(token);
+      userRole = user.role;
+    } catch (error) {
+      console.error("Invalid token:", error);
+      localStorage.removeItem("token"); // Optional: remove invalid token
+    }
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    // Call the logout function from useAuth if additional cleanup is needed
+    logout();
+    navigate("/"); // Adjust the path according to your routing setup
+  };
 
   return (
     <>
@@ -22,7 +41,7 @@ export default function SideBarOrganizer() {
               to="/"
               className="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none"
             >
-              <span className="fs-2 d-none d-sm-inline p-4  fw-bold ">
+              <span className="fs-2 d-none d-sm-inline p-4 fw-bold ">
                 Trolli
               </span>
             </Link>
@@ -57,37 +76,77 @@ export default function SideBarOrganizer() {
             </li>
             <li className="nav-item">
               <Link
-                to="update-tour"
-                className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
-              >
-                Update Or Delete Tour
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link
                 to="profile"
                 className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
               >
                 Profile
               </Link>
             </li>
-
             {
-              userRole === 'admin' && (
-               <li className="nav-item">
+              userRole === "organizer" && (
+                <>
+                <li className="nav-item">
+                  <Link
+                    to="update-tour"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Update Or Delete Tour
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    to="create-tour"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Create Tour
+                  </Link>
+                </li>
+
+                <li className="nav-item">
+                  <Link
+                    to="disscount"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Disscount
+                  </Link>
+                </li>
+                <li className="custom-service">
+                  <Link
+                    to="custom-service"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Custom Service
+                  </Link>
+                </li>
+                </>
+              )
+            }
+
+
+            {userRole === "admin" && (
+              <>
+                <li className="nav-item">
                   <Link
                     to="create-organizer"
                     className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
                   >
                     Create Organizer
                   </Link>
-                </li> 
-                
-              )
-            }
+                </li>
+                <li className="nav-item">
+                  <Link
+                    to="organizer-Activation"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Activation
+                  </Link>
+                </li>
+              </>
+            )}
             <li>
               <Link
                 to="#"
+                onClick={handleLogout} // Use onClick prop correctly
                 className="nav-link p-4 mt-3 fs-5 fw-bold text-white px-0 align-middle"
               >
                 Logout

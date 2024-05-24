@@ -8,7 +8,7 @@ export default function PieChart() {
   const [locations, setLocations] = useState([]);
 
   useEffect(() => {
-    axios.get('https://apis-2-4nek.onrender.com/tours/tours')
+    axios.get('http://localhost:2000/tours/tours')
       .then(response => {
         const locationsData = response.data.data.map(tour => tour.location);
         setLocations(locationsData);

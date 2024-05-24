@@ -155,7 +155,7 @@ export default function CreateTour() {
     }).then(async (result) => {
         if (result.isConfirmed) {
             try {
-                const url = 'https://apis-2-4nek.onrender.com/tours/create-tours';
+                const url = 'http://localhost:2000/tours/create-tours';
                 const response = await axios.post(url, tourData);
                 console.log('Response:', response.data);
                 Swal.fire("Saved!", "", "success");

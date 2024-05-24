@@ -8,7 +8,7 @@ const SplineChart = () => {
     const [toursData, setToursData] = useState([]);
 
     useEffect(() => {
-        axios.get('https://apis-2-4nek.onrender.com/tours/tours')
+        axios.get('http://localhost:2000/tours/tours')
             .then(response => {
                 setToursData(response.data.data || []);
                 console.log('Fetched data:', response.data.data);

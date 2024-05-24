@@ -5,36 +5,44 @@ import LanguageToggleButton from "../../Localization/LanguageToggleButton";
 import { colors } from "../../colors";
 import Navbar from "../Navbar/Navbar";
 import Footer from "../Footer/Footer";
-import { useAuth } from "../../Contexts/authContext ";
 import  axios  from 'axios';
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
+
 const Profile = () => {
   const { t, i18n } = useTranslation();
   const [openCard, setOpenCard] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const { user } = useAuth();
+  const user = jwtDecode(localStorage.getItem("token"));
   const [updatedUser, setUpdatedUser] = useState({ ...user });
   const [previewImage, setPreviewImage] = useState(null);
   const [profilePicture , setProfilePicture] = useState(null);
 
-  // useEffect(() => {
-  //   const fetchProfilePicture =  () => {
-  //     try {
-  //       const response =  axios.post(`http://localhost:2000/register/profile`, { email: user.email });
-  //       if (response.data && response.data.profilePicture) {
-  //         setProfilePicture(response.data.profilePicture);
-  //       } else {
-  //         console.error("Profile picture not found in server response:", response);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching profile picture:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (user && user.email) {
+        try {
+          const response = await axios.post('http://localhost:2000/register/profile', {
+            email: user.email,
+          }, {
+            responseType: 'arraybuffer' // This is important for handling binary data
+          });
+          
+          const blob = new Blob([response.data], { type: 'image/png' });
+          const imageUrl = URL.createObjectURL(blob);
+          setProfilePicture(imageUrl);
+        } catch (error) {
+          console.error("Error fetching profile picture:", error);
+        }
+      }
+    };
+
+    fetchProfilePicture();
+  }, [user]);
   
-  //   fetchProfilePicture();
-  // }, [user.email]);
 
   console.log(user.email)
+  console.log(profilePicture)
   
 
   const handleToggle = (cardName) => {
@@ -152,14 +160,6 @@ const Profile = () => {
     }
   };  
   
-  useEffect(() => {
-    // console.log("Updated user state:", updatedUser);
-    const pictureOfUesr = axios.post('http://localhost:2000/register/profile',{
-
-    })
-  }, []);
-
-
   return (
     <>
       <Navbar></Navbar>
@@ -278,8 +278,9 @@ const Profile = () => {
        </div>
        <div className="mt-4 mb-4">
          <p className="card-title ">
+          {/* <div>{profilePicture}</div> */}
            <img
-             src={previewImage || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
+             src={profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"}
              className="rounded-circle text-center me-3 img-fluid"
              alt="Profile img .... "
              style={{ height: "80px", width: "80px" }}

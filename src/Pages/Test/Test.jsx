@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "../Home/Home";
 import UserResetLink from "../../Pages/Sign/User/UserResetLink";
@@ -26,7 +26,7 @@ import Finance from "../../Components/FinanceOragnaizer/Finance";
 import { ModalProvider } from "../../Contexts/pypalContext";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { SearchProvider } from "../../Contexts/SearchResultContext";
-import { AuthProvider, useAuth } from "../../Contexts/authContext ";
+// import { AuthProvider, useAuth } from "../../Contexts/authContext";
 import ToursDetailsandBooking from "../../Components/Tours Detailsand information/ToursDetailsandBooking";
 import ContactUs from "../ContactUs/ContactUs";
 import Aboutus from "../AboutUs/Aboutus";
@@ -34,23 +34,27 @@ import Frequentlyaskedquestions from "../Frequentlyaskedquestions/Frequentlyaske
 import BookingVisa from "../BookingVisa/BookingVisa";
 import OrderResponse from "../OrderResponse/OrderResponse";
 import CreateOrganizerEmail from "../../Components/CreateOrganizerEmail/CreateOrganizerEmail";
+import {jwtDecode} from "jwt-decode";
+import { AuthProvider , useAuth } from './../../Contexts/authContext ';
+import Discounts from "../../Components/Discounts/Discounts";
+import OrganzierCustomService from "../../Components/OrganizerCostoumService/OrganzierCustomService";
+import OrganizerAcrivation from "../../Components/Organizer Ativation/OrganizerAcrivation";
 
 export default function Test() {
-  const [userRole , setUserRole] = useState("")
-  const { user } = useAuth();
-  // console.log(user.role)
-  if(user){
-    console.log(user.role)
-    setUserRole(user.role)
-  }
-  // const getUserRole = () => {
-  //   const role = localStorage.getItem("role");
-  //   return role ? role : "";
-  // };
+  const [userRole, setUserRole] = useState("");
+  const [user, setUser] = useState(null);
 
-  // const userRole = getUserRole();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedUser = jwtDecode(token);
+      setUser(decodedUser);
+      setUserRole(decodedUser.role);
+    }
+  }, []);
 
   return (
+    
     <GoogleOAuthProvider clientId="46424832078-grv3nhik7b2bii270htb8fots0bnj8ib.apps.googleusercontent.com">
       <AuthProvider>
         <DataToShowProvider>
@@ -72,14 +76,21 @@ export default function Test() {
                         <Route path="/signInUser" element={<UserSignIn />} />
                         <Route path="/one-time-password" element={<Onetimepassword />} />
                         <Route path="/otp-forget-password" element={<OtpForgetpassword />} />
-                        {userRole === "organizer" || userRole === "admin"  && (
+                        {user && (userRole === "admin" || userRole === "organizer") && (
                           <Route path="/organizer" element={<Organize />}>
                             <Route path="dashboard" element={<Dashboard />} />
                             <Route path="profile" element={<OrganizerProfile />} />
                             <Route path="create-tour" element={<CreateTour />} />
                             <Route path="update-tour" element={<UpdateandDeleteTour />} />
                             <Route path="finance" element={<Finance />} />
-                            <Route path = "create-organizer" element={<CreateOrganizerEmail />} />
+                            <Route path="disscount" element={<Discounts />} />
+                            <Route path="custom-service" element={<OrganzierCustomService></OrganzierCustomService>}></Route>
+                            {userRole === "admin" && (  
+                            <>
+                              <Route path="create-organizer" element={<CreateOrganizerEmail />} />
+                              <Route path="organizer-Activation" element={<OrganizerAcrivation></OrganizerAcrivation>} />
+                            </>
+                            )}
                           </Route>
                         )}
                         <Route path="/tours/:tourId" element={<ToursDetailsandBooking />} />
@@ -99,5 +110,7 @@ export default function Test() {
         </DataToShowProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
+
+    // <CreateOrganizerEmail></CreateOrganizerEmail>
   );
 }

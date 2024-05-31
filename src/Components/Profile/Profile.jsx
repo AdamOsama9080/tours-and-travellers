@@ -291,7 +291,7 @@ const Profile = () => {
            type="file"
            accept="image/*"
            onChange={handleProfilePictureChange}
-           disabled={!isEditing}
+           disabled={ !isEditing }
          />
        </div>
 

@@ -167,7 +167,6 @@ export default function UpdateandDeleteTour() {
         }
     };
     
-
     const handleDelete = async (e) => {
         e.preventDefault();
         const confirmResult = await Swal.fire({

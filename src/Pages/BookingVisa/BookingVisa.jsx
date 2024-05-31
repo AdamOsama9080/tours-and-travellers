@@ -1,42 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import Navbar from '../../Components/Navbar/Navbar'
-import Footer from '../../Components/Footer/Footer'
-import { colors } from '../../colors'
+import React, { useEffect, useState } from 'react';
+import Navbar from '../../Components/Navbar/Navbar';
+import Footer from '../../Components/Footer/Footer';
+import { colors } from '../../colors';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Swal from 'sweetalert2';
-import { useAuth } from '../../Contexts/authContext ';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
 
 export default function BookingVisa() {
-    const [tourInfo , setTourInfo] = useState(null);
-    const [numberOfTravelers, setNumberOfTravelers] = useState(0); 
+    const [tourInfo, setTourInfo] = useState(null);
+    const [numberOfTravelers, setNumberOfTravelers] = useState(0);
     const [travelerData, setTravelerData] = useState([]);
     const [paymentOption, setPaymentOption] = useState('payNow');
+    const [coupon, setCoupon] = useState('');
+    const [discount, setDiscount] = useState(0);
+    const user = jwtDecode(localStorage.getItem("token"));
 
     const location = useLocation();
-    const {user} = useAuth();
-    const userId  = user.id;
-    console.log(userId);
-    const navigate = useNavigate();
-    // console.log(user);
-    // useEffect(() => {
-    //     if (location.state && location.state.numberOfTravelers && location.state.tourId) {
-    //         console.log('Number of travelers:', location.state.numberOfTravelers);
-    //         console.log('Tour ID:', location.state.tourId);
-    //     }
-    // }, [location.state]);
+    const userId = user.id;
+    const userEmail = user.email;
 
-    // console.log('Number of travelers:', numberOfTravelers);
+    console.log(userId);
+    console.log(userEmail);
+    console.log(coupon); 
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (location.state && location.state.tourId) {
             axios.get(`http://localhost:2000/tours/tour/${location.state.tourId}`)
                 .then(response => {
-                    console.log(response.data.data);
-
-                    console.log(location.state)
                     setNumberOfTravelers(location.state.numberOfTravelers);
                     setTourInfo(response.data.data);
                 })
@@ -49,6 +44,7 @@ export default function BookingVisa() {
     const handlePaymentOptionChange = (option) => {
         setPaymentOption(option);
     };
+
     const handleBooking = () => {
         axios.post(`http://localhost:2000/booking`, {
             user: userId,
@@ -56,29 +52,25 @@ export default function BookingVisa() {
             travelers: travelerData,
             numOfPeople: location.state.numberOfTravelers
         })
-        .then(response => {
-            console.log('Booking successful:', response.data);
-            Swal.fire({
-                position: "top-end",
-                icon: "success",
-                title: "Your work has been saved",
-                showConfirmButton: false,
-                timer: 3000 
+            .then(response => {
+                Swal.fire({
+                    position: "top-end",
+                    icon: "success",
+                    title: "Your work has been saved",
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+                navigate('/OrderResponse', { state: { bookingResponse: response.data } });
+            })
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: error.response.data.message
+                });
             });
-            navigate('/OrderResponse', { state: { bookingResponse: response.data } });
-        })
-        .catch(error => {
-            console.error('Error making booking:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: error.response.data.message
-            });
-        });
-        console.log(travelerData);
     };
 
-    // Function to handle input change
     const handleInputChange = (index, event) => {
         const { name, value } = event.target;
         const updatedTravelerData = [...travelerData];
@@ -91,11 +83,67 @@ export default function BookingVisa() {
         return date.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
     };
 
+    const getOffer = () => {
+        axios.post('http://localhost:2000/coupon/validate-coupon', { code: coupon, email: userEmail })
+            .then(response => {
+                if (response.data.valid) {
+                    setDiscount(response.data.discount);
+                    Swal.fire({
+                        title: "Coupon Applied",
+                        icon: "success",
+                        width: 600,
+                        padding: "3em",
+                        color: "#716add",
+                        background: "#fff url(/images/trees.png)",
+                        backdrop: `
+                            rgba(0,0,123,0.4)
+                            url("/images/nyan-cat.gif")
+                            left top
+                            no-repeat
+                        `
+                    });
+                } else {
+                    Swal.fire({
+                        title: "Invalid Coupon",
+                        text: "The coupon code is not valid.",
+                        icon: "error",
+                        width: 600,
+                        padding: "3em",
+                        color: "#716add",
+                        background: "#fff url(/images/trees.png)",
+                        backdrop: `
+                            rgba(0,0,123,0.4)
+                            url("/images/nyan-cat.gif")
+                            left top
+                            no-repeat
+                        `
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: "Error",
+                    text: "An error occurred while validating the coupon.",
+                    icon: "error",
+                    width: 600,
+                    padding: "3em",
+                    color: "#716add",
+                    background: "#fff url(/images/trees.png)",
+                    backdrop: `
+                        rgba(0,0,123,0.4)
+                        url("/images/nyan-cat.gif")
+                        left top
+                        no-repeat
+                    `
+                });
+            });
+    };
+    
+
     if (!tourInfo) {
-        return <div>Loading...</div>; // or any loading indicator
+        return <div>Loading...</div>;
     }
 
-    // Render traveler sections based on numberOfTravelers
     const travelerSections = [];
     for (let i = 0; i < numberOfTravelers; i++) {
         travelerSections.push(
@@ -112,10 +160,12 @@ export default function BookingVisa() {
             </div>
         );
     }
+
+    const totalPrice = tourInfo.price * numberOfTravelers;
+    const discountedPrice = totalPrice - (totalPrice * (discount / 100));
     
 
     return (
-        // <div>BookingVisa</div>
         <>
             <Navbar></Navbar>
             <div className='container-fluid'>
@@ -136,7 +186,6 @@ export default function BookingVisa() {
 
                                             <div ></div>
                                         </div>
-                                        {/* 'rgba(231, 229, 246, 1)' */}
                                         <div className='col-md-12'>
                                             <div className='card bg-secondary.bg-gradient m-0' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
                                                 <div className='d-flex justify-content-between'>
@@ -145,7 +194,7 @@ export default function BookingVisa() {
                                                         Login
                                                     </p>
                                                 </div>
-                                            </div>`
+                                            </div>
                                         </div>
                                         <div className='col-md-12'>
                                             <form className='form-group'>
@@ -217,17 +266,6 @@ export default function BookingVisa() {
                                                 {
                                                     travelerSections
                                                 }
-                                                {/* <div className='row'>
-                                    <h4 className='fw-bold mt-4'>Location</h4>
-                                    <div className='col-md-6'>
-                                        <label htmlFor="firstname" className='text-black fw-bold'>First Name</label>
-                                        <input type="text" className='form-control' id='firstname' />
-                                    </div>
-                                    <div className='col-md-6'>
-                                        <label htmlFor="lastname" className='text-black fw-bold'>Last Name</label>
-                                        <input type="text" className='form-control' id='lastname' />
-                                    </div>
-                                </div> */}
                                             </form>
                                         </div>
                                     </div>
@@ -236,61 +274,61 @@ export default function BookingVisa() {
                         </div>
 
                         <div className='row'>
-            <div className='col-md-12'>
-                <div className='card'>
-                    <div className='d-flex align-items-center'>
-                        <i className='bi bi-3-circle me-3' style={{ color: colors.secondary, fontSize: ' 4rem' }}></i>
-                        <div>
-                            <h3 className='fw-bold' style={{ color: colors.primary }}>
-                                Payment Details
-                            </h3>
-                        </div>
-                    </div>
-                    <h3>Choose a payment date</h3>
-                    <div className='card p-0 '>
-                        <div className='p-4 ' style={{ borderBottom: '3px solid lightgray' }} >
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="paymentOption"
-                                    id="payNow"
-                                    value="payNow"
-                                    style={{ width: '1.5rem', height: '1.5rem' }}
-                                    checked={paymentOption === 'payNow'}
-                                    onChange={() => handlePaymentOptionChange('payNow')}
-                                />
-                                <label
-                                    className="form-check-label fw-bold fs-5 ms-2"
-                                    htmlFor="payNow"
-                                    style={{ color: colors.secondary }}
-                                >
-                                    Pay now
-                                </label>
-                            </div>
+                            <div className='col-md-12'>
+                                <div className='card'>
+                                    <div className='d-flex align-items-center'>
+                                        <i className='bi bi-3-circle me-3' style={{ color: colors.secondary, fontSize: ' 4rem' }}></i>
+                                        <div>
+                                            <h3 className='fw-bold' style={{ color: colors.primary }}>
+                                                Payment Details
+                                            </h3>
+                                        </div>
+                                    </div>
+                                    <h3>Choose a payment date</h3>
+                                    <div className='card p-0 '>
+                                        <div className='p-4 ' style={{ borderBottom: '3px solid lightgray' }} >
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="paymentOption"
+                                                    id="payNow"
+                                                    value="payNow"
+                                                    style={{ width: '1.5rem', height: '1.5rem' }}
+                                                    checked={paymentOption === 'payNow'}
+                                                    onChange={() => handlePaymentOptionChange('payNow')}
+                                                />
+                                                <label
+                                                    className="form-check-label fw-bold fs-5 ms-2"
+                                                    htmlFor="payNow"
+                                                    style={{ color: colors.secondary }}
+                                                >
+                                                    Pay now
+                                                </label>
+                                            </div>
 
-                        </div>
-                        <div className='p-4 ' style={{ borderBottom: '3px solid lightgray' }} >
-                            <div className="form-check">
-                                <input
-                                    className="form-check-input"
-                                    type="radio"
-                                    name="paymentOption"
-                                    id="addToItinerary"
-                                    value="addToItinerary"
-                                    style={{ width: '1.5rem', height: '1.5rem' }}
-                                    checked={paymentOption === 'addToItinerary'}
-                                    onChange={() => handlePaymentOptionChange('addToItinerary')}
-                                />
-                                <label
-                                    className="form-check-label fw-bold fs-5 ms-2"
-                                    htmlFor="addToItinerary"
-                                >
-                                    Add to Travel Itinerary
-                                </label>
-                            </div>
+                                        </div>
+                                        <div className='p-4 ' style={{ borderBottom: '3px solid lightgray' }} >
+                                            <div className="form-check">
+                                                <input
+                                                    className="form-check-input"
+                                                    type="radio"
+                                                    name="paymentOption"
+                                                    id="addToItinerary"
+                                                    value="addToItinerary"
+                                                    style={{ width: '1.5rem', height: '1.5rem' }}
+                                                    checked={paymentOption === 'addToItinerary'}
+                                                    onChange={() => handlePaymentOptionChange('addToItinerary')}
+                                                />
+                                                <label
+                                                    className="form-check-label fw-bold fs-5 ms-2"
+                                                    htmlFor="addToItinerary"
+                                                >
+                                                    Add to Travel Itinerary
+                                                </label>
+                                            </div>
 
-                        </div>
+                                        </div>
 
                         {paymentOption === 'payNow' && (
                             <div className='p-4' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}>
@@ -389,11 +427,7 @@ export default function BookingVisa() {
                                             value="payWithPayPal"
                                             style={{ width: '1.5rem', height: '1.5rem' }}
                                         />
-                                        <label
-                                            className="form-check-label fw-bold fs-5 ms-2"
-                                            htmlFor="payWithPayPal"
-                                            style={{ color: colors.secondary }}
-                                        >
+                                        <label className="form-check-label fw-bold fs-5 ms-2" htmlFor="payWithPayPal" style={{ color: colors.secondary }}>
                                             Pay with PayPal
                                         </label>
                                     </div>
@@ -435,18 +469,19 @@ export default function BookingVisa() {
                                 </div>
                                 <hr></hr>
                                 <div className='row'>
-                                    <form>
+                                    {/* <form> */}
                                         <div className='row'>
                                             <div className='col-md-12'>
                                                 <label htmlFor="firstname" className='text-black fw-bold mb-3'>Coupoun Code</label>
                                                 <div className='d-flex align-items-center'>
 
-                                                    <input type="text" className='form-control rounded-5 p-3' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} />
-                                                    <button className='btn btn-primary rounded-3 w-100 ms-2 p-3 fw-bold' style={{ backgroundColor: colors.secondary }}>Apply</button>
+                                                    <input type="text" className='form-control rounded-5 p-3' style={{ backgroundColor: 'rgba(0,0,0,0.1)' }} placeholder='Enter coupon code' value={coupon} onChange={(e) => setCoupon(e.target.value)} />
+                                                    <button className='btn btn-primary rounded-3 w-100 ms-2 p-3 fw-bold' style={{ backgroundColor: colors.secondary }} onClick={getOffer}>Apply</button>
+
                                                 </div>
                                             </div>
                                         </div>
-                                    </form>
+                                    {/* </form> */}
                                 </div>
                                 <hr></hr>
 
@@ -464,7 +499,6 @@ export default function BookingVisa() {
                                 <div className='row'>
                                     <div className='col-md-12'>
                                         <div className='d-flex align-items-center justify-content-between'>
-
                                             <p className='fw-bold m-0 text-black-50 fs-5'>Pay amount</p>
                                             <p className='fw-bold m-0 fs-4' style={{ color: colors.secondary }}>EGP {tourInfo.price*numberOfTravelers}</p>
                                         </div>

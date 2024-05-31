@@ -153,7 +153,7 @@ const Navbar = (props) => {
           }}
         >
           {[
-            { label: t("find tour"), path: "/search" },
+            { label: t("Tours"), path: "/search" },
             { label: t("navbar.bookings"), path: "/bookings" },
             { label: t("navbar.favourites"), path: "/favourites" },
           ].map(({ label, path }) => {

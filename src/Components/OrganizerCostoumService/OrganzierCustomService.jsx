@@ -10,9 +10,11 @@ export default function OrganizerCustomService() {
   const handleSearch = async () => {
     try {
       const response = await axios.post('http://localhost:2000/customservice/details', { input });
-      console.log(response);
+      console.log('Response:', response.data);
+      console.log('User Data:', response.data.user);
+      console.log('Booking Data:', response.data.bookings);
 
-      if (response.data && response.data.user && Array.isArray(response.data.booking)) {
+      if (response.data && response.data.user && Array.isArray(response.data.bookings)) {
         Swal.fire({
           title: 'Success!',
           text: 'Details fetched successfully.',
@@ -20,13 +22,16 @@ export default function OrganizerCustomService() {
         });
 
         setUserData(response.data.user);
-        setBookingData(response.data.data.booking);
+        setBookingData(response.data.bookings);
       } else {
         Swal.fire({
           title: 'No data found',
           text: 'No details found for the given input.',
           icon: 'warning'
         });
+
+        setUserData(null);
+        setBookingData([]);
       }
     } catch (error) {
       Swal.fire({
@@ -36,6 +41,8 @@ export default function OrganizerCustomService() {
       });
 
       console.error('Error fetching details:', error);
+      setUserData(null);
+      setBookingData([]);
     }
   };
 
@@ -62,26 +69,26 @@ export default function OrganizerCustomService() {
           </div>
         </div>
 
-        {userData && bookingData.length > 0 && bookingData.map((booking, index) => (
-          <div className='col-md-12' key={index}>
-            <div className='card'>
-              <div className='card-body'>
-                <p className='fs-4'>Name: {userData.firstName} {userData.lastName}</p>
-                <p className='fs-4'>Email: {userData.email}</p>
-                <p className='fs-4'>TourCode: {booking.tripCode}</p>
-                <p className='fs-4'>isCanceld: {booking.isCanceld.toString()}</p>
-                <p className='fs-4'>No. OF Tickets: {booking.numOfPeople}</p>
-                <button className='btn btn-primary'>Cancel Trip</button>
+        {userData && bookingData.length > 0 ? (
+          bookingData.map((booking, index) => (
+            <div className='col-md-12' key={index}>
+              <div className='card'>
+                <div className='card-body'>
+                  <p className='fs-4'>Name: {userData.firstName} {userData.lastName}</p>
+                  <p className='fs-4'>Email: {userData.email}</p>
+                  <p className='fs-4'>TourCode: {booking.tripCode}</p>
+                  <p className='fs-4'>isCanceld: {booking.isCanceld.toString()}</p>
+                  <p className='fs-4'>No. OF Tickets: {booking.numOfPeople}</p>
+                  <button className='btn btn-primary'>Cancel Trip</button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-
-        {userData && bookingData.length === 0 && (
+          ))
+        ) : (
           <div className='col-md-12'>
             <div className='card'>
               <div className='card-body'>
-                <p className='fs-4'>No bookings found for this user.</p>
+                <p className='fs-4'>No data found for the given input.</p>
               </div>
             </div>
           </div>

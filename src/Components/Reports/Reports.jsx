@@ -116,77 +116,81 @@ export default function Reports() {
         <div className='col-md-9 g-4'>
             <div className='row'>
                 <div className="col-md-12">
-                    <div className='card'>
-                        <div className='card-body'>
-                            <h1 className="mb-4">Reports</h1>
-                            <div className="mb-3">
-                                <button className="btn btn-success mr-2" onClick={handleExcelDownload}>
-                                    Download Excel
-                                </button>
-                                <button className="btn btn-danger" onClick={handlePdfDownload}>
-                                    Download PDF
-                                </button>
-                            </div>
-                            {showExcelCheckboxes && (
-                                <div className="mb-3">
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            name="selectAll"
-                                            checked={selectedExcelOptions.selectAll}
-                                            onChange={handleExcelCheckboxChange}
-                                        />
-                                        <label className="form-check-label">Select All</label>
-                                    </div>
-                                    {['booking', 'tours', 'users', 'coupons', 'reviews', 'contacts', 'subscription', 'favourites'].map((option) => (
-                                        <div key={option} className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                name={option}
-                                                checked={selectedExcelOptions[option]}
-                                                onChange={handleExcelCheckboxChange}
-                                            />
-                                            <label className="form-check-label">{option.charAt(0).toUpperCase() + option.slice(1)}</label>
-                                        </div>
-                                    ))}
-                                    <button className="btn btn-primary mt-3" onClick={downloadSelectedDataAsExcel}>
-                                        Download Selected Data as Excel
-                                    </button>
-                                </div>
-                            )}
-                            {showPdfCheckboxes && (
-                                <div className="mb-3">
-                                    <div className="form-check">
-                                        <input
-                                            className="form-check-input"
-                                            type="checkbox"
-                                            name="selectAll"
-                                            checked={selectedPdfOptions.selectAll}
-                                            onChange={handlePdfCheckboxChange}
-                                        />
-                                        <label className="form-check-label">Select All</label>
-                                    </div>
-                                    {['toursLocation', 'numberOfTravelers', 'tourDuration', 'profits'].map((option) => (
-                                        <div key={option} className="form-check">
-                                            <input
-                                                className="form-check-input"
-                                                type="checkbox"
-                                                name={option}
-                                                checked={selectedPdfOptions[option]}
-                                                onChange={handlePdfCheckboxChange}
-                                            />
-                                            <label className="form-check-label">{option.charAt(0).toUpperCase() + option.slice(1)}</label>
-                                        </div>
-                                    ))}
-                                    <button className="btn btn-primary mt-3" onClick={downloadSelectedDataAsPdf}>
-                                        Download Selected Data as PDF
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                <div className='container mt-5'>
+            <h1 className="mb-4">Reports</h1>
+            <div className="row mb-3">
+                <div className='col-md-6'>
+                    <button className="btn btn-success w-100 d-flex justify-content-center align-items-center" onClick={handleExcelDownload}>
+                    <i className="bi bi-file-earmark-spreadsheet text-black me-3 fw-bold fs-4"></i>
+                        Download Excel
+                    </button>
+                </div>
+                <div className='col-md-6'>
+                    <button className="btn btn-danger w-100 d-flex justify-content-center align-items-center" onClick={handlePdfDownload}>
+                    <i className="bi bi-file-earmark-pdf text-black me-3 fw-bold fs-4"></i>
+                        Download PDF
+                    </button>
+                </div>
+            </div>
+            {showExcelCheckboxes && (
+                <div className="mb-3">
+                    <div className="form-check">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            name="selectAll"
+                            checked={selectedExcelOptions.selectAll}
+                            onChange={handleExcelCheckboxChange}
+                        />
+                        <label className="form-check-label">Select All</label>
                     </div>
+                    {['booking', 'tours', 'users', 'coupons', 'reviews', 'contacts', 'subscription', 'favourites'].map((option) => (
+                        <div key={option} className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name={option}
+                                checked={selectedExcelOptions[option]}
+                                onChange={handleExcelCheckboxChange}
+                            />
+                            <label className="form-check-label">{option.charAt(0).toUpperCase() + option.slice(1)}</label>
+                        </div>
+                    ))}
+                    <button className="btn btn-primary mt-3" onClick={downloadSelectedDataAsExcel}>
+                        Download Selected Data as Excel
+                    </button>
+                </div>
+            )}
+            {showPdfCheckboxes && (
+                <div className="mb-3">
+                    <div className="form-check">
+                        <input
+                            className="form-check-input"
+                            type="checkbox"
+                            name="selectAll"
+                            checked={selectedPdfOptions.selectAll}
+                            onChange={handlePdfCheckboxChange}
+                        />
+                        <label className="form-check-label">Select All</label>
+                    </div>
+                    {['toursLocation', 'numberOfTravelers', 'tourDuration', 'profits'].map((option) => (
+                        <div key={option} className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name={option}
+                                checked={selectedPdfOptions[option]}
+                                onChange={handlePdfCheckboxChange}
+                            />
+                            <label className="form-check-label">{option.charAt(0).toUpperCase() + option.slice(1)}</label>
+                        </div>
+                    ))}
+                    <button className="btn btn-primary mt-3" onClick={downloadSelectedDataAsPdf}>
+                        Download Selected Data as PDF
+                    </button>
+                </div>
+            )}
+        </div>
                 </div>
             </div>
         </div>

@@ -39,6 +39,7 @@ import { AuthProvider , useAuth } from './../../Contexts/authContext ';
 import Discounts from "../../Components/Discounts/Discounts";
 import OrganzierCustomService from "../../Components/OrganizerCostoumService/OrganzierCustomService";
 import OrganizerAcrivation from "../../Components/Organizer Ativation/OrganizerAcrivation";
+import Reports from "../../Components/Reports/Reports";
 
 export default function Test() {
   const [userRole, setUserRole] = useState("");
@@ -85,6 +86,7 @@ export default function Test() {
                             <Route path="finance" element={<Finance />} />
                             <Route path="disscount" element={<Discounts />} />
                             <Route path="custom-service" element={<OrganzierCustomService></OrganzierCustomService>}></Route>
+                            <Route path="reports" element={<Reports></Reports>}></Route>
                             {userRole === "admin" && (  
                             <>
                               <Route path="create-organizer" element={<CreateOrganizerEmail />} />

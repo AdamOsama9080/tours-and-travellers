@@ -22,6 +22,7 @@ export default function ToursDetailsandBooking() {
     const [goodRate, setGoodRate] = useState(0);
     const [poorRate, setPoorRate] = useState(0);
     const [tourQuality, setTourQuality] = useState("");
+    const [profilePicture , setProfilePicture] = useState(null);
 
 
     const [formData, setFormData] = useState({
@@ -142,101 +143,120 @@ export default function ToursDetailsandBooking() {
         }
     }, [tourData]);
 
+    useEffect(() => {
+        const fetchProfilePicture = async () => {
+          if (user && user.email) {
+            try {
+              const response = await axios.post('http://localhost:2000/register/profile', {
+                email: user.email,
+              }, {
+                responseType: 'arraybuffer' // This is important for handling binary data
+              });
+              
+              const blob = new Blob([response.data], { type: 'image/png' });
+              const imageUrl = URL.createObjectURL(blob);
+              setProfilePicture(imageUrl);
+            } catch (error) {
+              console.error("Error fetching profile picture:", error);
+            }
+          }
+        };
+    
+        fetchProfilePicture();
+      }, [user]);
+
     console.log(relatedTour);
-useEffect(() => {
-    axios.get(`http://localhost:2000/reviews/reviews/tour/${tourId}`)
-        .then(response => {
-            console.log('Response:=====>', response.data);
-            const tourReviewsData = response.data;
-            console.log('Tour Info:', tourReviewsData);
+    useEffect(() => {
+        axios.get(`http://localhost:2000/reviews/reviews/tour/${tourId}`)
+            .then(response => {
+                console.log('Response:=====>', response.data);
+                const tourReviewsData = response.data;
+                console.log('Tour Info:', tourReviewsData);
 
-            let totalRating = 0;
-            let excellentTotalRating = 0;
-            let veryGoodTotalRating = 0;
-            let averageTotalRating = 0;
-            let goodTotalRating = 0;
-            let poorTotalRating = 0;
-            let excellentCount = 0;
-            let veryGoodCount = 0;
-            let averageCount = 0;
-            let goodCount = 0;
-            let poorCount = 0;
-            let tourQuality = "" ; 
+                let totalRating = 0;
+                let excellentTotalRating = 0;
+                let veryGoodTotalRating = 0;
+                let averageTotalRating = 0;
+                let goodTotalRating = 0;
+                let poorTotalRating = 0;
+                let excellentCount = 0;
+                let veryGoodCount = 0;
+                let averageCount = 0;
+                let goodCount = 0;
+                let poorCount = 0;
+                let tourQuality = "" ; 
 
-            for (let i = 0; i < tourReviewsData.length; i++) {
-                const rating = tourReviewsData[i].rating;
-                totalRating += rating;
+                for (let i = 0; i < tourReviewsData.length; i++) {
+                    const rating = tourReviewsData[i].rating;
+                    totalRating += rating;
 
 
+                    
+                    
+                    switch (Math.floor(rating)) {
+                        case 5:
+                            excellentTotalRating += rating;
+                            excellentCount++;
+                            break;
+                        case 4:
+                            veryGoodTotalRating += rating;
+                            veryGoodCount++;
+                            break;
+                        case 3:
+                            averageTotalRating += rating;
+                            averageCount++;
+                            break;
+                        case 2:
+                            goodTotalRating += rating;
+                            goodCount++;
+                            break;
+                        default:
+                            poorTotalRating += rating;
+                            poorCount++;
+                            break;
+                    }
+                }
+
+                const averageRating = totalRating / tourReviewsData.length;
+                const excellentAverageRating = excellentCount > 0 ? excellentTotalRating / excellentCount : 0;
+                const veryGoodAverageRating = veryGoodCount > 0 ? veryGoodTotalRating / veryGoodCount : 0;
+                const averageAverageRating = averageCount > 0 ? averageTotalRating / averageCount : 0;
+                const goodAverageRating = goodCount > 0 ? goodTotalRating / goodCount : 0;
+                const poorAverageRating = poorCount > 0 ? poorTotalRating / poorCount : 0;
                 
-                
-                switch (Math.floor(rating)) {
+                switch (Math.floor(averageRating)) {
                     case 5:
-                        excellentTotalRating += rating;
-                        excellentCount++;
+                        tourQuality = "Excellent";
                         break;
                     case 4:
-                        veryGoodTotalRating += rating;
-                        veryGoodCount++;
+                        tourQuality = "Very Good";
                         break;
                     case 3:
-                        averageTotalRating += rating;
-                        averageCount++;
+                        tourQuality = "Average";
                         break;
                     case 2:
-                        goodTotalRating += rating;
-                        goodCount++;
+                        tourQuality = "Good";
                         break;
                     default:
-                        poorTotalRating += rating;
-                        poorCount++;
+                        tourQuality = "Poor";
                         break;
                 }
-            }
-
-            const averageRating = totalRating / tourReviewsData.length;
-            const excellentAverageRating = excellentCount > 0 ? excellentTotalRating / excellentCount : 0;
-            const veryGoodAverageRating = veryGoodCount > 0 ? veryGoodTotalRating / veryGoodCount : 0;
-            const averageAverageRating = averageCount > 0 ? averageTotalRating / averageCount : 0;
-            const goodAverageRating = goodCount > 0 ? goodTotalRating / goodCount : 0;
-            const poorAverageRating = poorCount > 0 ? poorTotalRating / poorCount : 0;
-            
-            switch (Math.floor(averageRating)) {
-                case 5:
-                    tourQuality = "Excellent";
-                    break;
-                case 4:
-                    tourQuality = "Very Good";
-                    break;
-                case 3:
-                    tourQuality = "Average";
-                    break;
-                case 2:
-                    tourQuality = "Good";
-                    break;
-                default:
-                    tourQuality = "Poor";
-                    break;
-            }
-            setTourQuality(tourQuality);
-            
-            setTourRate(averageRating);
-            setExcellentRate(excellentAverageRating);
-            setVeryGoodRate(veryGoodAverageRating);
-            setAverageRate(averageAverageRating);
-            setGoodRate(goodAverageRating);
-            setPoorRate(poorAverageRating);
-            
-            setTourReviews(tourReviewsData); // Set tourReviews to the array of reviews only
-        })
-        .catch(error => {
-            console.error("Error fetching tour reviews :", error);
-        });
-}, [tourId]);
+                setTourQuality(tourQuality);
+                
+                setTourRate(averageRating);
+                setExcellentRate(excellentAverageRating);
+                setVeryGoodRate(veryGoodAverageRating);
+                setAverageRate(averageAverageRating);
+                setGoodRate(goodAverageRating);
+                setPoorRate(poorAverageRating);
+                
+                setTourReviews(tourReviewsData); // Set tourReviews to the array of reviews only
+            })
+            .catch(error => {
+                console.error("Error fetching tour reviews :", error);
+            });
+    }, [tourId]);
     
-    
-    
-
     console.log(tourReviews);
 
     const handleBookNowClick = () => {
@@ -632,9 +652,14 @@ useEffect(() => {
                                         <div className='review' key={index} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
                                             <div className='row p-3'>
                                                 <div className='col-md-4 d-flex align-items-center'>
-                                                    <img src={review.profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{ height: '150px', width: '150px' }} />
+                                                {user && user.id === review.userId._id && (
+                                                        <>
+                                                            <img src={profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{ height: '150px', width: '150px' }} />
+
+                                                        </>
+                                                    )}
                                                     <div className='ms-2'>
-                                                        <p className='text-black fw-bold fs-5 m-0 text-capitalize'>{review.userId.firstName} {review.userId.lastName} {review.userId._id}</p>
+                                                        <p className='text-black fw-bold fs-5 m-0 text-capitalize'>{review.userId.firstName} {review.userId.lastName} </p>
                                                         <p className='text-black-50 m-0'>{formatDate(review.reviewDate)}</p>
                                                         <div className='m-0'>
                                                             {[...Array(Math.floor(review.rating))].map((_, i) => (

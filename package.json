@@ -25,6 +25,7 @@
     "joi": "^17.12.2",
     "js-cookie": "^3.0.5",
     "jsonwebtoken": "^9.0.2",
+    "jspdf": "^2.5.1",
     "jwt-decode": "^4.0.0",
     "mdb-ui-kit": "^7.2.0",
     "mdbreact": "^4.6.1",
@@ -44,6 +45,7 @@
     "sweetalert2": "^11.10.6",
     "web-vitals": "^3.5.2",
     "workbox-webpack-plugin": "^7.0.0",
+    "xlsx": "^0.18.5",
     "yup": "^1.4.0"
   },
   "scripts": {

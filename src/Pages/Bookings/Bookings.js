@@ -1,14 +1,5 @@
-import {
-  AppBar,
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  Divider,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
+import {AppBar,Box,Card,CardContent,CardMedia,Divider,Tab,Tabs,Typography,} 
+from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Navbar from "../../Components/Navbar/Navbar";
 import Footer from "../../Components/Footer/Footer";
@@ -22,10 +13,11 @@ import savedIcon from "../../Images/icons/savedIcon.png";
 import cancelledImg from "../../Images/cancelledImg.png";
 import axios from "axios";
 import { v4 as uuid } from "uuid";
-import { useAuth } from "../../Contexts/authContext ";
 import Swal from "sweetalert2";
+import { jwtDecode } from "jwt-decode";
 export default function Bookings() {
-  const { user } = useAuth(); 
+  // const { user } = useAuth(); 
+  const user = jwtDecode(localStorage.getItem("token"));
   console.log(user);
   console.log(user.id);
   const [value, setValue] = useState(0);

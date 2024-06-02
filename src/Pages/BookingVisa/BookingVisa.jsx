@@ -86,7 +86,7 @@ export default function BookingVisa() {
     const getOffer = () => {
         axios.post('http://localhost:2000/coupon/validate-coupon', { code: coupon, email: userEmail })
             .then(response => {
-                if (response.data.valid) {
+                if (response) {
                     setDiscount(response.data.discount);
                     Swal.fire({
                         title: "Coupon Applied",

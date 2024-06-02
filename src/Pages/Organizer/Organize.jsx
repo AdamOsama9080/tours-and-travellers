@@ -10,6 +10,7 @@ import CreateOrganizerEmail from "../../Components/CreateOrganizerEmail/CreateOr
 import Discounts from "../../Components/Discounts/Discounts";
 import OrganzierCustomService from "../../Components/OrganizerCostoumService/OrganzierCustomService";
 import OrganizerAcrivation from "../../Components/Organizer Ativation/OrganizerAcrivation";
+import Reports from "../../Components/Reports/Reports";
 
 export default function Organize() {
   return (
@@ -28,6 +29,7 @@ export default function Organize() {
           {/* <Route path="/organize-tours" element={<OrganzierCustomService></OrganzierCustomService>}></Route> */}
           <Route path="/organizer-Activation" element={<OrganizerAcrivation></OrganizerAcrivation>}></Route>
           <Route path="/custom-service" element={<OrganzierCustomService></OrganzierCustomService>}></Route>
+          <Route path="reports" element={<Reports></Reports>}></Route>
         </Routes>
       </div>
     </div>

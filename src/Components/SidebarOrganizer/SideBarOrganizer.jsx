@@ -118,6 +118,14 @@ export default function SideBarOrganizer() {
                     Custom Service
                   </Link>
                 </li>
+                <li className="custom-service">
+                  <Link
+                    to="reports"
+                    className="nav-link p-4 mt-3 fs-5 fw-bold text-white align-middle px-0"
+                  >
+                    Reports
+                  </Link>
+                </li>
                 </>
               )
             }

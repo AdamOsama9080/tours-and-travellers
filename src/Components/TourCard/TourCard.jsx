@@ -107,8 +107,8 @@ export default function TourCard({ tourData }) {
                     <div className='position-absolute p-1 px-2 text-white' style={{ backgroundColor: colors.secondary, borderRadius: '5px', top: '1rem', left: '1rem' }}>
                         {tourData.Featured ? "Featured" : null}
                     </div>
-                    <div className='position-absolute p-1 px-2 text-white bg-danger' style={{ borderRadius: '5px', top: '4rem', left: '1rem' }}>-80%</div>
-                    <img src="" className="w-100 rounded-start" alt="..." />
+                    <div className='position-absolute p-1 px-2 text-white bg-danger' style={{ borderRadius: '5px', top: '4rem', left: '1rem' }}>-{tourData.discountPercentage}%</div>
+                    <img src={tourData.mainImage} className=" rounded-start w-100" style={{ height:"375px"}} alt="...fffffffffffffffffffffffff" />
                 </div>
                 <div className="col-md-8">
                     <div className="card-body p-0">
@@ -160,8 +160,8 @@ export default function TourCard({ tourData }) {
 
                                     <div className='pb-2 align-items-end'>
                                         <span>From</span>
-                                        <div className='fw-bold fs-3' style={{ color: '#000' }}>EGP {tourData.price}</div>
-                                        <div className='text-danger fw-bold'>50 Savings <del className='text-black-50 fw-bold'>550</del></div>
+                                        <div className='fw-bold fs-3' style={{ color: '#000' }}>EGP {(tourData.price * (1 - tourData.discountPercentage / 100))}</div>
+                                        <div className='text-danger fw-bold'>{(tourData.price - (tourData.price * (1 - tourData.discountPercentage / 100)))} Savings <del className='text-black-50 fw-bold'>{tourData.price}</del></div>
                                     </div>
                                     <button className='btn w-100 mt-3' style={{ backgroundColor: '#5F41B2', color: '#fff' }} onClick={() => handleSelectTour(tourData._id)}>Select Tour</button>
                                 </div>

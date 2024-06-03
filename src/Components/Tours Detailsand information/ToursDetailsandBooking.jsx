@@ -394,17 +394,17 @@ export default function ToursDetailsandBooking() {
                                         <div className='col-md-12' style={{ height: '400px !important' }}>
                                             <div className='row'>
                                                 <div className='col-md-6'>
-                                                    <img src="https://i.pinimg.com/236x/1f/1e/80/1f1e80a8c3d561346588d15c33ab2d1b.jpg" className='w-100 h-50' alt='image1' style={{ borderRadius: '10px' }} />
+                                                    <img src={tourData.mainImage} className='w-100 h-50' alt='image1' style={{ borderRadius: '10px' }} />
                                                 </div>
                                                 <div className='col-lg-6 d-none d-md-block'>
                                                     <div className='row'>
                                                         <div className='col-md-6'>
-                                                            <img src="https://i.pinimg.com/236x/be/20/65/be2065f863d9f8236b727e206a1ec06a.jpg" className='w-100 h-25 gap-1 pb-1' alt='image2' style={{ borderRadius: '10px' }} />
-                                                            <img src="https://i.pinimg.com/236x/be/20/65/be2065f863d9f8236b727e206a1ec06a.jpg" className='w-100 h-25 gap-1 pt-1' alt='image2' style={{ borderRadius: '10px' }} />
+                                                            <img src={tourData.images[0]} className='w-100 h-25 gap-1 pb-1' alt='image2' style={{ borderRadius: '10px' }} />
+                                                            <img src={tourData.images[1]} className='w-100 h-25 gap-1 pt-1' alt='image2' style={{ borderRadius: '10px' }} />
                                                         </div>
                                                         <div className='col-lg-6'>
-                                                            <img src="https://i.pinimg.com/236x/8c/4e/9d/8c4e9d4f1c16c0f732afbc43953c8e83.jpg" className='w-100 h-25 gap-1 pb-1' alt='image4' style={{ borderRadius: '10px' }} />
-                                                            <img src="https://i.pinimg.com/236x/8c/4e/9d/8c4e9d4f1c16c0f732afbc43953c8e83.jpg" className='w-100 h-25 gap-1 pt-1' alt='image4' style={{ borderRadius: '10px' }} />
+                                                            <img src={tourData.images[2]} className='w-100 h-25 gap-1 pb-1' alt='image4' style={{ borderRadius: '10px' }} />
+                                                            <img src={tourData.mainImage} className='w-100 h-25 gap-1 pt-1' alt='image4' style={{ borderRadius: '10px' }} />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -416,7 +416,7 @@ export default function ToursDetailsandBooking() {
 
                                 <div className='row p-4'>
                                     <div className='col-md-9'>
-                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>{tourData.price} EGY</h4>
+                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>{(tourData.price-(1-(tourData.discountPercentage/100)))} EGY</h4>
                                         <p className='text-black-50 fs-6'>Total</p>
                                     </div>
                                     <div className='col-md-3'>
@@ -806,7 +806,7 @@ export default function ToursDetailsandBooking() {
                                 <div className='col-md-4 d-flex justify-content-center' key={index}>
                                     <div className="card p-0 w-75">
                                         <div className='position-relative'>
-                                            <img src="https://i.pinimg.com/564x/9c/70/7b/9c707b0ffd93a9a3268815dbed5b2fb0.jpg" className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
+                                            <img src={tour.mainImage} className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
                                             <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
                                             {tour.Featured && (
                                                 <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
@@ -835,11 +835,11 @@ export default function ToursDetailsandBooking() {
                                             <div className='d-flex justify-content-between mt-3'>
                                                 <div className=''>
                                                     <div className='d-flex flex-row-reverse'>
-                                                        <del className='fw-bold text-black-50 '>1100</del>
+                                                        <del className='fw-bold text-black-50 '>{tour.price}</del>
                                                     </div>
                                                     <div className='d-flex align-items-center'>
                                                         <p>From</p>
-                                                        <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{tour.price} EGY</p>
+                                                        <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{(tour.price-(1-tour.disscount)*tour.price)} EGY</p>
                                                     </div>
                                                 </div>
 

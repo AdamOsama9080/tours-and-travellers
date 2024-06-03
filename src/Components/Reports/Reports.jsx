@@ -1,7 +1,5 @@
 import React, { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import axios from 'axios';
 import PieChart from '../../Components/PieChart/PieChart';
 import ColumnChart from '../../Components/ColumnChart/ColumnChart';
 import SplineChart from '../../Components/SplineChart/SplineChart';
@@ -10,14 +8,10 @@ export default function Reports() {
     const [showExcelCheckboxes, setShowExcelCheckboxes] = useState(false);
     const [showPdfCheckboxes, setShowPdfCheckboxes] = useState(false);
     const [selectedExcelOptions, setSelectedExcelOptions] = useState({
-        booking: false,
         tours: false,
         users: false,
         coupons: false,
-        reviews: false,
         contacts: false,
-        subscription: false,
-        favourites: false,
         selectAll: false,
     });
 
@@ -48,14 +42,10 @@ export default function Reports() {
             ...prevOptions,
             [name]: checked,
             ...(name === 'selectAll' && {
-                booking: checked,
                 tours: checked,
                 users: checked,
                 coupons: checked,
-                reviews: checked,
                 contacts: checked,
-                subscription: checked,
-                favourites: checked,
             }),
         }));
     };
@@ -76,57 +66,30 @@ export default function Reports() {
     };
 
     const downloadSelectedDataAsExcel = () => {
-        const data = [];
-        if (selectedExcelOptions.booking) data.push({ category: 'Booking', data: 'Sample Booking Data' });
-        if (selectedExcelOptions.tours) data.push({ category: 'Tours', data: 'Sample Tours Data' });
-        if (selectedExcelOptions.users) data.push({ category: 'Users', data: 'Sample Users Data' });
-        if (selectedExcelOptions.coupons) data.push({ category: 'Coupons', data: 'Sample Coupons Data' });
-        if (selectedExcelOptions.reviews) data.push({ category: 'Reviews', data: 'Sample Reviews Data' });
-        if (selectedExcelOptions.contacts) data.push({ category: 'Contacts', data: 'Sample Contacts Data' });
-        if (selectedExcelOptions.subscription) data.push({ category: 'Subscription', data: 'Sample Subscription Data' });
-        if (selectedExcelOptions.favourites) data.push({ category: 'Favourites', data: 'Sample Favourites Data' });
+        const selectedCollections = [];
+        if (selectedExcelOptions.tours) selectedCollections.push('tours');
+        if (selectedExcelOptions.users) selectedCollections.push('users');
+        if (selectedExcelOptions.coupons) selectedCollections.push('coupons');
+        if (selectedExcelOptions.contacts) selectedCollections.push('contacts');
 
-        const worksheet = XLSX.utils.json_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-        XLSX.writeFile(workbook, 'Report.xlsx');
-
-        setShowExcelCheckboxes(false);
+        axios.post('http://localhost:2000/report/generate-report', { collections: selectedCollections }, {
+            responseType: 'blob' 
+        })
+        .then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'Report.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            setShowExcelCheckboxes(false);
+        })
+        .catch((error) => {
+            console.error('Error downloading the Excel report:', error);
+        });
     };
 
     const downloadSelectedDataAsPdf = () => {
-        const pdf = new jsPDF();
-        const promises = [];
-
-        if (selectedPdfOptions.toursLocation) {
-            promises.push(html2canvas(pieChartRef.current));
-        }
-        if (selectedPdfOptions.numberOfTravelers) {
-            promises.push(html2canvas(columnChartRef.current));
-        }
-        if (selectedPdfOptions.tourDuration) {
-            promises.push(html2canvas(splineChartRef.current));
-        }
-
-        Promise.all(promises).then((canvases) => {
-            canvases.forEach((canvas, index) => {
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 190;
-                const pageHeight = 295;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let position = 10;
-
-                if (index > 0) {
-                    pdf.addPage();
-                    position = 0;
-                }
-
-                pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            });
-
-            pdf.save('Report.pdf');
-        });
-
         setShowPdfCheckboxes(false);
     };
 
@@ -162,7 +125,7 @@ export default function Reports() {
                                     />
                                     <label className="form-check-label">Select All</label>
                                 </div>
-                                {['booking', 'tours', 'users', 'coupons', 'reviews', 'contacts', 'subscription', 'favourites'].map((option) => (
+                                {['tours', 'users', 'coupons', 'contacts'].map((option) => (
                                     <div key={option} className="form-check">
                                         <input
                                             className="form-check-input"

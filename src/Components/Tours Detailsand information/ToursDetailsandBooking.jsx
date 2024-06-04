@@ -136,13 +136,18 @@ export default function ToursDetailsandBooking() {
                 location: tourData.location
             }).then(response => {
                 console.log('Response:', response);
-                setRelatedTour(response.data.data);
+                if (response.data.status === 'success' && response.data.data) {
+                    setRelatedTour(response.data.data);
+                } else {
+                    setRelatedTour([]);
+                }
             }).catch(error => {
                 console.error("Error fetching related tours:", error);
+                setRelatedTour([]);
             });
         }
     }, [tourData]);
-
+    
     useEffect(() => {
         const fetchProfilePicture = async () => {
           if (user && user.email) {
@@ -802,64 +807,65 @@ export default function ToursDetailsandBooking() {
                         </h2>
 
                         <div className='row'>
-                            {relatedTour.slice(0, visibleTours).map((tour, index) => (
-                                <div className='col-md-4 d-flex justify-content-center' key={index}>
-                                    <div className="card p-0 w-75">
-                                        <div className='position-relative'>
-                                            <img src={tour.mainImage} className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
-                                            <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
-                                            {tour.Featured && (
-                                                <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
-                                            )}
-                                            {
-                                                tour.disscount && (
-                                                    <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1  rounded-2 bg-danger' style={{ top: "5rem", left: "3rem" }}>-80 %</p>
-                                                )
-                                            }
-                                        </div>
-                                        <div className="card-body">
-                                            <div className='d-flex fs-6'>
-                                                <i className="bi bi-geo-alt me-3"></i>
-                                                <p className='text-capitalize'>{tour.location}</p>
-                                            </div>
-
-                                            <div className='border-bottom'>
-                                                <div className='fw-bold fs-5'>{tour.description}</div>
-                                                <div className='d-flex m-3 ms-0'>
-                                                    {renderStars(tour.rating)}
-
-                                                    <div className='text-black-50 ms-3'>({tour.reviews.length} Reviews)</div>
-                                                </div>
-                                            </div>
-
-                                            <div className='d-flex justify-content-between mt-3'>
-                                                <div className=''>
-                                                    <div className='d-flex flex-row-reverse'>
-                                                        <del className='fw-bold text-black-50 '>{tour.price}</del>
-                                                    </div>
-                                                    <div className='d-flex align-items-center'>
-                                                        <p>From</p>
-                                                        <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{(tour.price-(1-tour.disscount)*tour.price)} EGY</p>
-                                                    </div>
-                                                </div>
-
-                                                <div>
-                                                    <p className='text-black-50 m-0'><i className="bi bi-clock"></i> {tour.duration}</p>
-                                                    <p className='text-black-50 m-0'><i className="bi bi-check2"></i> free cancellation</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            {relatedTour.length > visibleTours && (
-                                <div className='d-flex justify-content-end'>
-                                    <div>
-                                        <p className='fs-5 pe-5' style={{ color: colors.secondary, cursor: "pointer" }} onClick={handleShowMoreClick}>Show More</p>
-                                    </div>
-                                </div>
-                            )}
+    {relatedTour.length > 0 ? (
+        relatedTour.slice(0, visibleTours).map((tour, index) => (
+            <div className='col-md-4 d-flex justify-content-center' key={index}>
+                <div className="card p-0 w-75">
+                    <div className='position-relative'>
+                        <img src={tour.mainImage} className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
+                        <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
+                        {tour.Featured && (
+                            <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
+                        )}
+                        {tour.disscount && (
+                            <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 rounded-2 bg-danger' style={{ top: "5rem", left: "3rem" }}>-80 %</p>
+                        )}
+                    </div>
+                    <div className="card-body">
+                        <div className='d-flex fs-6'>
+                            <i className="bi bi-geo-alt me-3"></i>
+                            <p className='text-capitalize'>{tour.location}</p>
                         </div>
+                        <div className='border-bottom'>
+                            <div className='fw-bold fs-5'>{tour.description}</div>
+                            <div className='d-flex m-3 ms-0'>
+                                {renderStars(tour.rating)}
+                                <div className='text-black-50 ms-3'>({tour.reviews.length} Reviews)</div>
+                            </div>
+                        </div>
+                        <div className='d-flex justify-content-between mt-3'>
+                            <div className=''>
+                                <div className='d-flex flex-row-reverse'>
+                                    <del className='fw-bold text-black-50 '>{tour.price}</del>
+                                </div>
+                                <div className='d-flex align-items-center'>
+                                    <p>From</p>
+                                    <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{(tour.price - (1 - tour.disscount) * tour.price)} EGY</p>
+                                </div>
+                            </div>
+                            <div>
+                                <p className='text-black-50 m-0'><i className="bi bi-clock"></i> {tour.duration}</p>
+                                <p className='text-black-50 m-0'><i className="bi bi-check2"></i> free cancellation</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        ))
+    ) : (
+        <div className='col-12 d-flex justify-content-center'>
+            <p className='fs-5 text-muted'>No related tours found</p>
+        </div>
+    )}
+</div>
+{relatedTour.length > visibleTours && (
+    <div className='d-flex justify-content-end'>
+        <div>
+            <p className='fs-5 pe-5' style={{ color: colors.secondary, cursor: "pointer" }} onClick={handleShowMoreClick}>Show More</p>
+        </div>
+    </div>
+)}
+
                         
                     </div>
             </div>

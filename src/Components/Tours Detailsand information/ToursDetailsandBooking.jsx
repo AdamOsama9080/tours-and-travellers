@@ -11,9 +11,9 @@ import { jwtDecode } from 'jwt-decode';
 
 export default function ToursDetailsandBooking() {
     const [activeTab, setActiveTab] = useState('overview');
-    const [tourData, setTourData] = useState(null); 
+    const [tourData, setTourData] = useState(null);
     const [relatedTour, setRelatedTour] = useState([]);
-    const [visibleTours, setVisibleTours] = useState(3); 
+    const [visibleTours, setVisibleTours] = useState(3);
     const [tourReviews, setTourReviews] = useState([]);
     const [tourRate, setTourRate] = useState(0);
     const [excellentRate, setExcellentRate] = useState(0);
@@ -22,7 +22,7 @@ export default function ToursDetailsandBooking() {
     const [goodRate, setGoodRate] = useState(0);
     const [poorRate, setPoorRate] = useState(0);
     const [tourQuality, setTourQuality] = useState("");
-    const [profilePicture , setProfilePicture] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null);
 
 
     const [formData, setFormData] = useState({
@@ -39,29 +39,29 @@ export default function ToursDetailsandBooking() {
 
     const user = jwtDecode(localStorage.getItem('token'));
     console.log(user.id);
-    
+
     const navigate = useNavigate();
-    
+
     const { tourId } = useParams();
     console.log('this is the tour id =>', tourId);
-    
+
     function handleTabClick(tab) {
         setActiveTab(tab);
     }
-    
+
     useEffect(() => {
         axios.get(`http://localhost:2000/tours/tour/${tourId}`)
-        .then(response => {
-            console.log('Response:', response);
-            const tourInfo = response.data.data;
-            console.log('Tour Info:', tourInfo);
-            setTourData(tourInfo);
-        })
-        .catch(error => {
-            console.error("Error fetching tour data:", error);
-        });
+            .then(response => {
+                console.log('Response:', response);
+                const tourInfo = response.data.data;
+                console.log('Tour Info:', tourInfo);
+                setTourData(tourInfo);
+            })
+            .catch(error => {
+                console.error("Error fetching tour data:", error);
+            });
     }, [tourId]);
-    
+
     console.log(tourData);
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -83,7 +83,7 @@ export default function ToursDetailsandBooking() {
         const totalCategories = Object.keys(formData).length - 4; // Subtracting name, email, reviewTitle, reviewText
         return totalRatings / totalCategories;
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         console.log('Form Data:', formData);
@@ -147,28 +147,28 @@ export default function ToursDetailsandBooking() {
             });
         }
     }, [tourData]);
-    
+
     useEffect(() => {
         const fetchProfilePicture = async () => {
-          if (user && user.email) {
-            try {
-              const response = await axios.post('http://localhost:2000/register/profile', {
-                email: user.email,
-              }, {
-                responseType: 'arraybuffer' // This is important for handling binary data
-              });
-              
-              const blob = new Blob([response.data], { type: 'image/png' });
-              const imageUrl = URL.createObjectURL(blob);
-              setProfilePicture(imageUrl);
-            } catch (error) {
-              console.error("Error fetching profile picture:", error);
+            if (user && user.email) {
+                try {
+                    const response = await axios.post('http://localhost:2000/register/profile', {
+                        email: user.email,
+                    }, {
+                        responseType: 'arraybuffer' // This is important for handling binary data
+                    });
+
+                    const blob = new Blob([response.data], { type: 'image/png' });
+                    const imageUrl = URL.createObjectURL(blob);
+                    setProfilePicture(imageUrl);
+                } catch (error) {
+                    console.error("Error fetching profile picture:", error);
+                }
             }
-          }
         };
-    
+
         fetchProfilePicture();
-      }, [user]);
+    }, [user]);
 
     console.log(relatedTour);
     useEffect(() => {
@@ -189,15 +189,15 @@ export default function ToursDetailsandBooking() {
                 let averageCount = 0;
                 let goodCount = 0;
                 let poorCount = 0;
-                let tourQuality = "" ; 
+                let tourQuality = "";
 
                 for (let i = 0; i < tourReviewsData.length; i++) {
                     const rating = tourReviewsData[i].rating;
                     totalRating += rating;
 
 
-                    
-                    
+
+
                     switch (Math.floor(rating)) {
                         case 5:
                             excellentTotalRating += rating;
@@ -228,7 +228,7 @@ export default function ToursDetailsandBooking() {
                 const averageAverageRating = averageCount > 0 ? averageTotalRating / averageCount : 0;
                 const goodAverageRating = goodCount > 0 ? goodTotalRating / goodCount : 0;
                 const poorAverageRating = poorCount > 0 ? poorTotalRating / poorCount : 0;
-                
+
                 switch (Math.floor(averageRating)) {
                     case 5:
                         tourQuality = "Excellent";
@@ -247,25 +247,25 @@ export default function ToursDetailsandBooking() {
                         break;
                 }
                 setTourQuality(tourQuality);
-                
+
                 setTourRate(averageRating);
                 setExcellentRate(excellentAverageRating);
                 setVeryGoodRate(veryGoodAverageRating);
                 setAverageRate(averageAverageRating);
                 setGoodRate(goodAverageRating);
                 setPoorRate(poorAverageRating);
-                
+
                 setTourReviews(tourReviewsData); // Set tourReviews to the array of reviews only
             })
             .catch(error => {
                 console.error("Error fetching tour reviews :", error);
             });
     }, [tourId]);
-    
+
     console.log(tourReviews);
 
     const handleBookNowClick = () => {
-        if (!tourData) return; 
+        if (!tourData) return;
 
         axios.get(`http://localhost:2000/tours/tour/${tourId}`)
             .then(response => {
@@ -288,7 +288,7 @@ export default function ToursDetailsandBooking() {
                     if (result.isConfirmed) {
                         const numberOfTravelers = parseInt(result.value);
                         if (numberOfTravelers <= emptyPlaces && numberOfTravelers > 0) {
-                            navigate(`/BookingVisa`, { state: { numberOfTravelers ,tourId: tourId } });
+                            navigate(`/BookingVisa`, { state: { numberOfTravelers, tourId: tourId } });
                         } else {
                             Swal.fire({
                                 title: "Invalid number of travelers",
@@ -364,7 +364,7 @@ export default function ToursDetailsandBooking() {
         return <div>Loading...</div>;
     }
 
-    
+
 
 
 
@@ -421,7 +421,7 @@ export default function ToursDetailsandBooking() {
 
                                 <div className='row p-4'>
                                     <div className='col-md-9'>
-                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>{(tourData.price-(1-(tourData.discountPercentage/100)))} EGY</h4>
+                                        <h4 className='fw-bold fs-4' style={{ color: colors.secondary }}>{(tourData.price - (1 - (tourData.discountPercentage / 100)))} EGY</h4>
                                         <p className='text-black-50 fs-6'>Total</p>
                                     </div>
                                     <div className='col-md-3'>
@@ -477,318 +477,318 @@ export default function ToursDetailsandBooking() {
                                     </div>
                                 </div>
                                 {
-                                    activeTab === 'overview' &&(
+                                    activeTab === 'overview' && (
                                         <div>
-                                        <div className='col-md-12 mt-5'>
-                                            <div className='row p-3'>
-                                                <div className='col-md-3 d-flex'>
-                                                    <i className="bi bi-clock fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                                    <div>
-                                                        <h6 className='fs-6 fw-bold'>Duration</h6>
-                                                        <p className='fs-6 text-black-50'>{tourData.duration}</p>
+                                            <div className='col-md-12 mt-5'>
+                                                <div className='row p-3'>
+                                                    <div className='col-md-3 d-flex'>
+                                                        <i className="bi bi-clock fw-bold me-3" style={{ fontSize: '2rem' }}></i>
+                                                        <div>
+                                                            <h6 className='fs-6 fw-bold'>Duration</h6>
+                                                            <p className='fs-6 text-black-50'>{tourData.duration}</p>
+                                                        </div>
+
                                                     </div>
-            
-                                                </div>
-                                                <div className='col-md-3 d-flex'>
-                                                    <i className="bi bi-backpack fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                                    <div>
-                                                        <h6 className='fs-6 fw-bold'>Tour Type</h6>
-                                                        <p className='fs-6 text-black-50'>{tourData.type}</p>
+                                                    <div className='col-md-3 d-flex'>
+                                                        <i className="bi bi-backpack fw-bold me-3" style={{ fontSize: '2rem' }}></i>
+                                                        <div>
+                                                            <h6 className='fs-6 fw-bold'>Tour Type</h6>
+                                                            <p className='fs-6 text-black-50'>{tourData.type}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-md-3 d-flex'>
+                                                        <i class="bi bi-people fw-bold me-3" style={{ fontSize: '2rem' }}></i>
+                                                        <div>
+                                                            <h6 className='fs-6 fw-bold'>Group Size</h6>
+                                                            <p className='fs-6 text-black-50'>{tourData.totalTravelers} peoples</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className='col-md-3 d-flex'>
+                                                        <i className="bi bi-translate fw-bold me-3" style={{ fontSize: '2rem' }}></i>
+                                                        <div>
+                                                            <h6 className='fs-6 fw-bold'>Languages</h6>
+                                                            <p className='fs-6 text-black-50'>English + 2more</p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className='col-md-3 d-flex'>
-                                                <i class="bi bi-people fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                                <div>
-                                                    <h6 className='fs-6 fw-bold'>Group Size</h6>
-                                                    <p className='fs-6 text-black-50'>{tourData.totalTravelers} peoples</p>
-                                                </div>
-                                                </div>
-                                                <div className='col-md-3 d-flex'>
-                                                    <i className="bi bi-translate fw-bold me-3" style={{fontSize:'2rem'}}></i>
-                                                    <div>
-                                                        <h6 className='fs-6 fw-bold'>Languages</h6>
-                                                        <p className='fs-6 text-black-50'>English + 2more</p>
+                                            </div>
+
+                                            <div className='col-md-12 mt-3 p-3'>
+                                                <h2 className='fs-1 fw-bold text-capitalize'>
+                                                    About this tour
+                                                </h2>
+                                                <p className='fs-6 text-black-50'>{tourData.description}</p>
+                                            </div>
+
+                                            <div className='col-md-12  p-3'>
+                                                <h2 className='fs-1 fw-bold text-capitalize'>
+                                                    highlights
+                                                </h2>
+                                                <ul>
+                                                    {tourData.highlights.map((highlight, index) => (
+                                                        <li key={index} className='fs-6 text-black-50'>{highlight}</li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            <div className='col-md-12 p-3'>
+                                                <h2 className='fs-1 fw-bold text-capitalize'>
+                                                    included / excluded
+                                                </h2>
+                                                <div className='col-md-12 d-flex'>
+                                                    <div className='col-md-6'>
+                                                        {tourData.included.map((included, index) => (
+                                                            <div key={index} className=''>
+                                                                <i className="bi bi-check fw-bold fs-4 me-2" style={{ color: colors.secondary }}></i>
+                                                                <span className='text-black  fs-6 text-capitalize'>{included}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                    <div className='col-md-6'>
+                                                        {tourData.excluded.map((excluded, index) => (
+                                                            <div key={index} className=''>
+                                                                <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
+                                                                <span className='text-black  fs-6 text-capitalize'>{excluded}</span>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-            
-                                        <div className='col-md-12 mt-3 p-3'>
-                                            <h2 className='fs-1 fw-bold text-capitalize'>
-                                                About this tour
-                                            </h2>
-                                            <p className='fs-6 text-black-50'>{tourData.description}</p>
-                                        </div>
-            
-                                        <div className='col-md-12  p-3'>
-                                            <h2 className='fs-1 fw-bold text-capitalize'>
-                                                highlights
-                                            </h2>
-                                            <ul>
-                                                {tourData.highlights.map((highlight, index) => (
-                                                    <li key={index} className='fs-6 text-black-50'>{highlight}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-            
-                                        <div className='col-md-12 p-3'>
-                                            <h2 className='fs-1 fw-bold text-capitalize'>
-                                                included / excluded
-                                            </h2>
-                                            <div className='col-md-12 d-flex'>
-                                                <div className='col-md-6'>
-                                                    {tourData.included.map((included, index) => (
-                                                        <div key={index} className=''>
-                                                            <i className="bi bi-check fw-bold fs-4 me-2" style={{color: colors.secondary}}></i>
-                                                            <span className='text-black  fs-6 text-capitalize'>{included}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                                <div className='col-md-6'>
-                                                    {tourData.excluded.map((excluded, index) => (
-                                                        <div key={index} className=''>
-                                                            <i className="bi bi-x-lg text-danger  fw-bold fs-4 me-2" ></i>
-                                                            <span className='text-black  fs-6 text-capitalize'>{excluded}</span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     )}
 
                                 {
                                     activeTab === 'program' && (
                                         <div>
-                                        {
-                                            tourData.program.map((program, index) => (
-                                                <div key={index} className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                                    <div className='d-flex align-items-center '>
-                                                        <i className={`bi bi-${index + 1}-circle fw-bold me-3`} style={{ color: colors.secondary, fontSize: '5rem' }}></i>
-                                                        <h4 className='font-capitalize'>{program}</h4>
+                                            {
+                                                tourData.program.map((program, index) => (
+                                                    <div key={index} className='col-md-12 p-3' style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                                                        <div className='d-flex align-items-center '>
+                                                            <i className={`bi bi-${index + 1}-circle fw-bold me-3`} style={{ color: colors.secondary, fontSize: '5rem' }}></i>
+                                                            <h4 className='font-capitalize'>{program}</h4>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            ))
-                                        }
+                                                ))
+                                            }
                                         </div>
-                                )}
+                                    )}
 
 
                                 {
                                     activeTab === 'reviews' && (
-                                <div>
-                                    <div className='card'>
-                                        <div className='row align-items-center'>
-                                            <div className='col-md-5 fs-2 fw-bold border-right' style={{ borderRight: '4px solid rgba(0,0,0,0.1)' }}>
-                                                <p className='text-align-left' style={{ color: colors.secondary }}>{tourRate}/5</p>
-                                                <p className='text-black'>{tourQuality}</p>
-                                                <div className='d-flex m-3 ms-0 fs-5'>
-                                                    {renderStars(tourRate)}
-                                                    <div className='text-black-50 ms-3'>({tourReviews.length} Reviews)</div>
+                                        <div>
+                                            <div className='card'>
+                                                <div className='row align-items-center'>
+                                                    <div className='col-md-5 fs-2 fw-bold border-right' style={{ borderRight: '4px solid rgba(0,0,0,0.1)' }}>
+                                                        <p className='text-align-left' style={{ color: colors.secondary }}>{tourRate}/5</p>
+                                                        <p className='text-black'>{tourQuality}</p>
+                                                        <div className='d-flex m-3 ms-0 fs-5'>
+                                                            {renderStars(tourRate)}
+                                                            <div className='text-black-50 ms-3'>({tourReviews.length} Reviews)</div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className='col-md-7 border-bottom-1'>
+                                                        <div className='d-flex align-items-baseline w-75 justify-content-around'>
+                                                            <div className='col-md-3'>
+                                                                <p className=' me-4 fs-5 text-black-50'>Excellent</p>
+                                                            </div>
+                                                            <div className="progress col-md-7" style={{ height: '15px' }}>
+                                                                <div className="progress-bar " role="progressbar" style={{ width: `${excellentRate}%`, backgroundColor: colors.secondary }} />
+                                                            </div>
+                                                            <div className='col-md-1'>
+                                                                <p className='fw-bold ms-3' style={{ color: colors.secondary }} >{excellentRate}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className='d-flex align-items-baseline w-75 justify-content-around'>
+                                                            <div className='col-md-3'>
+                                                                <p className=' me-4 fs-5 text-black-50'>Very Good</p>
+                                                            </div>
+                                                            <div className="progress col-md-7" style={{ height: '15px' }}>
+                                                                <div className="progress-bar " role="progressbar" style={{ width: `${veryGoodRate}%`, backgroundColor: colors.secondary }} />
+                                                            </div>
+                                                            <div className='col-md-1'>
+                                                                <p className='fw-bold ms-3' style={{ color: colors.secondary }} >{veryGoodRate}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className='d-flex align-items-baseline w-75 justify-content-around'>
+                                                            <div className='col-md-3'>
+                                                                <p className=' me-4 fs-5 text-black-50'>Average</p>
+                                                            </div>
+                                                            <div className="progress col-md-7" style={{ height: '15px' }}>
+                                                                <div className="progress-bar " role="progressbar" style={{ width: `${averageRate}%`, backgroundColor: colors.secondary }} />
+                                                            </div>
+                                                            <div className='col-md-1'>
+                                                                <p className='fw-bold ms-3' style={{ color: colors.secondary }} >{averageRate}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className='d-flex align-items-baseline w-75 justify-content-around'>
+                                                            <div className='col-md-3'>
+                                                                <p className=' me-4 fs-5 text-black-50'>Good</p>
+                                                            </div>
+                                                            <div className="progress col-md-7" style={{ height: '15px' }}>
+                                                                <div className="progress-bar " role="progressbar" style={{ width: `${goodRate}%`, backgroundColor: colors.secondary }} />
+                                                            </div>
+                                                            <div className='col-md-1'>
+                                                                <p className='fw-bold ms-3' style={{ color: colors.secondary }} >{goodRate}</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className='d-flex align-items-baseline w-75 justify-content-around'>
+                                                            <div className='col-md-3'>
+                                                                <p className=' me-4 fs-5 text-black-50'>Poor</p>
+                                                            </div>
+                                                            <div className="progress col-md-7" style={{ height: '15px' }}>
+                                                                <div className="progress-bar " role="progressbar" style={{ width: `${poorRate}%`, backgroundColor: colors.secondary }} />
+                                                            </div>
+                                                            <div className='col-md-1'>
+                                                                <p className='fw-bold ms-3' style={{ color: colors.secondary }} >{poorRate}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className='col-md-7 border-bottom-1'>
-                                                <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-3'>
-                                                        <p className=' me-4 fs-5 text-black-50'>Excellent</p>
+
+                                            <p className='w-100 text-center fw-bold fs-5 text-black-50'>250 reviews on this Tour-Showing 1 to 2</p>
+
+
+                                            {tourReviews.length > 0 ? (
+                                                tourReviews.map((review, index) => (
+                                                    <div className='review' key={index} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
+                                                        <div className='row p-3'>
+                                                            <div className='col-md-4 d-flex align-items-center'>
+                                                                {user && user.id === review.userId._id && (
+                                                                    <>
+                                                                        <img src={profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{ height: '150px', width: '150px' }} />
+
+                                                                    </>
+                                                                )}
+                                                                <div className='ms-2'>
+                                                                    <p className='text-black fw-bold fs-5 m-0 text-capitalize'>{review.userId.firstName} {review.userId.lastName} </p>
+                                                                    <p className='text-black-50 m-0'>{formatDate(review.reviewDate)}</p>
+                                                                    <div className='m-0'>
+                                                                        {[...Array(Math.floor(review.rating))].map((_, i) => (
+                                                                            <i key={i} className="bi bi-star-fill" style={{ color: 'gold' }}></i>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className='col-md-8 text-left'>
+                                                                <p className='fs-5 fw-bold text-end m-0 me-5'>helpful <i className="bi bi-hand-thumbs-up" style={{ color: colors.secondary }}></i></p>
+                                                                {user && user.id === review.userId._id && (
+                                                                    <>
+                                                                        <p className='fs-5 fw-bold text-end m-0 me-5 mt-2'>Edit <i className="bi bi-pencil"></i></p>
+                                                                        <p className='fs-5 fw-bold text-end m-0 me-5 mt-2' onClick={() => handleDeleteReview(review._id)}>Delete <i className="bi bi-trash3 text-danger"></i></p>
+                                                                    </>
+                                                                )}
+                                                            </div>
+
+                                                            <div className='col-md-12'>
+                                                                <div className='mt-3'>
+                                                                    <h5>{review.reviewTitle}</h5>
+                                                                    <p className='text-black-50'>{review.reviewText}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: `${excellentRate}%`, backgroundColor: colors.secondary}}  />
-                                                    </div>
-                                                    <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{excellentRate}</p>
-                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="text-center mt-3">No reviews available.</div>
+                                            )}
+
+                                            <div className='add-review'>
+
+                                                <div className='fs-4 mt-4 fw-bold'>
+                                                    Leave a reveiew
                                                 </div>
-                                                <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-3'>
-                                                        <p className=' me-4 fs-5 text-black-50'>Very Good</p>
-                                                    </div>
-                                                    <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: `${veryGoodRate}%`, backgroundColor: colors.secondary}}  />
-                                                    </div>
-                                                    <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{veryGoodRate}</p>
-                                                    </div>
-                                                </div>
-                                                <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-3'>
-                                                        <p className=' me-4 fs-5 text-black-50'>Average</p>
-                                                    </div>
-                                                    <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: `${averageRate}%`, backgroundColor: colors.secondary}}  />
-                                                    </div>
-                                                    <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{averageRate}</p>
-                                                    </div>
-                                                </div>
-                                                <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-3'>
-                                                        <p className=' me-4 fs-5 text-black-50'>Good</p>
-                                                    </div>
-                                                    <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: `${goodRate}%`, backgroundColor: colors.secondary}}  />
-                                                    </div>
-                                                    <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{goodRate}</p>
-                                                    </div>
-                                                </div>
-                                                <div className='d-flex align-items-baseline w-75 justify-content-around'>
-                                                    <div className='col-md-3'>
-                                                        <p className=' me-4 fs-5 text-black-50'>Poor</p>
-                                                    </div>
-                                                    <div className="progress col-md-7" style={{height: '15px'}}>
-                                                        <div className="progress-bar " role="progressbar" style={{width: `${poorRate}%`, backgroundColor: colors.secondary}}  />
-                                                    </div>
-                                                    <div className='col-md-1'>
-                                                        <p className='fw-bold ms-3' style={{color:colors.secondary}} >{poorRate}</p>
-                                                    </div>
+
+                                                <p className='fw-bold text-black-50 mt-2 mb-0'>Your e-mail address will not be show to other</p>
+
+                                                <div className=''>
+                                                    <form className='form-group' onSubmit={handleSubmit} >
+                                                        <div className='row'>
+                                                            <div className='col-md-6'>
+                                                                <input type="text" className='form-control p-4 fs-5 my-3' placeholder='Name' name="name" value={formData.name} onChange={handleChange} required />
+                                                            </div>
+                                                            <div className='col-md-6'>
+                                                                <input type="email" className='form-control p-4 fs-5 my-3' placeholder='Email' name="email" value={formData.email} onChange={handleChange} required />
+                                                            </div>
+                                                            <div className='col-md-12'>
+                                                                <input type="text" className='form-control p-4 fs-5 ' placeholder='Give your review a title' name="reviewTitle" value={formData.reviewTitle} onChange={handleChange} required />
+                                                            </div>
+                                                            <div className='card col-md-6 m-0 my-3'>
+                                                                <div className='d-flex justify-content-between'>
+                                                                    <p className='fs-6 fw-bold text-black-50'>Guide</p>
+                                                                    <Rating name="guideRating" value={formData.guideRating} onChange={(event, newValue) => handleRatingChange("guideRating", newValue)} style={{ color: "gold" }} />
+                                                                </div>
+                                                                <div className='d-flex justify-content-between'>
+                                                                    <p className='fs-6 fw-bold text-black-50'>Location</p>
+                                                                    <Rating name="locationRating" value={formData.locationRating} onChange={(event, newValue) => handleRatingChange("locationRating", newValue)} style={{ color: "gold" }} />
+                                                                </div>
+                                                                <div className='d-flex justify-content-between'>
+                                                                    <p className='fs-6 fw-bold text-black-50'>Cleanliness</p>
+                                                                    <Rating name="cleanlinessRating" value={formData.cleanlinessRating} onChange={(event, newValue) => handleRatingChange("cleanlinessRating", newValue)} style={{ color: "gold" }} />
+                                                                </div>
+                                                                <div className='d-flex justify-content-between'>
+                                                                    <p className='fs-6 fw-bold text-black-50'>Service</p>
+                                                                    <Rating name="serviceRating" value={formData.serviceRating} onChange={(event, newValue) => handleRatingChange("serviceRating", newValue)} style={{ color: "gold" }} />
+                                                                </div>
+                                                                <div className='d-flex justify-content-between'>
+                                                                    <p className='fs-6 fw-bold text-black-50'>Transportation</p>
+                                                                    <Rating name="transportationRating" value={formData.transportationRating} onChange={(event, newValue) => handleRatingChange("transportationRating", newValue)} style={{ color: "gold" }} />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className='col-md-6'>
+                                                                <textarea rows={7} type="text" className='form-control p-4 fs-5 my-3' placeholder='Write your review' name="reviewText" value={formData.reviewText} onChange={handleChange} required />
+                                                            </div>
+                                                        </div>
+
+                                                        <div className='d-flex justify-content-end'>
+                                                            <button type="submit" className='btn btn-warning px-5 text-white rounded-2 col-md-3' style={{ backgroundColor: colors.secondary }}>Post review</button>
+                                                        </div>
+                                                    </form>
                                                 </div>
                                             </div>
+
+
+
+
+
                                         </div>
-                                    </div>
+                                    )}
 
 
-                                    <p className='w-100 text-center fw-bold fs-5 text-black-50'>250 reviews on this Tour-Showing 1 to 2</p>
-
-
-                                    {tourReviews.length > 0 ? (
-                                    tourReviews.map((review, index) => (
-                                        <div className='review' key={index} style={{ borderBottom: '1px solid rgba(0,0,0,0.1)' }}>
-                                            <div className='row p-3'>
-                                                <div className='col-md-4 d-flex align-items-center'>
-                                                {user && user.id === review.userId._id && (
-                                                        <>
-                                                            <img src={profilePicture || "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"} className="rounded-circle text-center me-3 img-fluid" alt='profile-picture' style={{ height: '150px', width: '150px' }} />
-
-                                                        </>
-                                                    )}
-                                                    <div className='ms-2'>
-                                                        <p className='text-black fw-bold fs-5 m-0 text-capitalize'>{review.userId.firstName} {review.userId.lastName} </p>
-                                                        <p className='text-black-50 m-0'>{formatDate(review.reviewDate)}</p>
-                                                        <div className='m-0'>
-                                                            {[...Array(Math.floor(review.rating))].map((_, i) => (
-                                                                <i key={i} className="bi bi-star-fill" style={{ color: 'gold' }}></i>
-                                                            ))}
-                                                        </div>
-                                                    </div>
+                                {
+                                    activeTab === 'questions' && (
+                                        <div className='Quetions'>
+                                            <div className=''>
+                                                <h2 className='fw-bold fs-1'>What tourists ask about the tour ?</h2>
+                                            </div>
+                                            <div className='row'>
+                                                <div className='card  col-md-11'>
+                                                    <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer hotel transfers?</h3>
+                                                    <p className='fw-bold w-75 mt-2 text-black-50'>Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case a tour operator representative will be at the hotel to pickup you you. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.</p>
                                                 </div>
-
-                                                <div className='col-md-8 text-left'>
-                                                    <p className='fs-5 fw-bold text-end m-0 me-5'>helpful <i className="bi bi-hand-thumbs-up" style={{ color: colors.secondary }}></i></p>
-                                                    {user && user.id === review.userId._id && (
-                                                        <>
-                                                            <p className='fs-5 fw-bold text-end m-0 me-5 mt-2'>Edit <i className="bi bi-pencil"></i></p>
-                                                            <p className='fs-5 fw-bold text-end m-0 me-5 mt-2' onClick={() => handleDeleteReview(review._id)}>Delete <i className="bi bi-trash3 text-danger"></i></p>
-                                                        </>
-                                                    )}
-                                                </div>
-
-                                                <div className='col-md-12'>
-                                                    <div className='mt-3'>
-                                                        <h5>{review.reviewTitle}</h5>
-                                                        <p className='text-black-50'>{review.reviewText}</p>
-                                                    </div>
+                                                <div className='card col-md-11'>
+                                                    <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer accessiblity staffs.</h3>
                                                 </div>
                                             </div>
+                                            <div className='col-md-6' style={{ borderTop: "1px solid rgba(0,0,0,0.1)" }}>
+                                                <h2 className='fw-bold fs-1 pt-3'>Cancellation policy</h2>
+                                            </div>
+                                            <div>
+                                                <p className='text-black-50'>You can cancel up to 24 hours in advance of the experience for a full refund.</p>
+                                                <ul>
+                                                    <li className='text-black-50'>For a full refund, you must cancel at least 24 hours before the experience’s start time.</li>
+                                                    <li className='text-black-50'>If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded.</li>
+                                                    <li className='text-black-50'>Any changes made less than 24 hours before the experience’s start time will not be accepted.</li>
+                                                </ul>
+                                            </div>
                                         </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center mt-3">No reviews available.</div>
-                                )}
-
-                                    <div className='add-review'>
-
-                                        <div className='fs-4 mt-4 fw-bold'>
-                                            Leave a reveiew
-                                        </div>
-
-                                        <p className='fw-bold text-black-50 mt-2 mb-0'>Your e-mail address will not be show to other</p>
-
-                                        <div className=''>
-                                        <form className='form-group' onSubmit={handleSubmit} >
-                                                <div className='row'>
-                                                    <div className='col-md-6'>
-                                                        <input type="text" className='form-control p-4 fs-5 my-3' placeholder='Name' name="name" value={formData.name} onChange={handleChange} required />
-                                                    </div>
-                                                    <div className='col-md-6'>
-                                                        <input type="email" className='form-control p-4 fs-5 my-3' placeholder='Email' name="email" value={formData.email} onChange={handleChange} required />
-                                                    </div>
-                                                    <div className='col-md-12'>
-                                                        <input type="text" className='form-control p-4 fs-5 ' placeholder='Give your review a title' name="reviewTitle" value={formData.reviewTitle} onChange={handleChange} required />
-                                                    </div>
-                                                    <div className='card col-md-6 m-0 my-3'>
-                                                        <div className='d-flex justify-content-between'>
-                                                            <p className='fs-6 fw-bold text-black-50'>Guide</p>
-                                                            <Rating name="guideRating" value={formData.guideRating} onChange={(event, newValue) => handleRatingChange("guideRating", newValue)} style={{ color: "gold" }} />
-                                                        </div>
-                                                        <div className='d-flex justify-content-between'>
-                                                            <p className='fs-6 fw-bold text-black-50'>Location</p>
-                                                            <Rating name="locationRating" value={formData.locationRating} onChange={(event, newValue) => handleRatingChange("locationRating", newValue)} style={{ color: "gold" }} />
-                                                        </div>
-                                                        <div className='d-flex justify-content-between'>
-                                                            <p className='fs-6 fw-bold text-black-50'>Cleanliness</p>
-                                                            <Rating name="cleanlinessRating" value={formData.cleanlinessRating} onChange={(event, newValue) => handleRatingChange("cleanlinessRating", newValue)} style={{ color: "gold" }} />
-                                                        </div>
-                                                        <div className='d-flex justify-content-between'>
-                                                            <p className='fs-6 fw-bold text-black-50'>Service</p>
-                                                            <Rating name="serviceRating" value={formData.serviceRating} onChange={(event, newValue) => handleRatingChange("serviceRating", newValue)} style={{ color: "gold" }} />
-                                                        </div>
-                                                        <div className='d-flex justify-content-between'>
-                                                            <p className='fs-6 fw-bold text-black-50'>Transportation</p>
-                                                            <Rating name="transportationRating" value={formData.transportationRating} onChange={(event, newValue) => handleRatingChange("transportationRating", newValue)} style={{ color: "gold" }} />
-                                                        </div>
-                                                    </div>
-
-                                                    <div className='col-md-6'>
-                                                        <textarea rows={7} type="text" className='form-control p-4 fs-5 my-3' placeholder='Write your review' name="reviewText" value={formData.reviewText} onChange={handleChange} required />
-                                                    </div>
-                                                </div>
-
-                                                <div className='d-flex justify-content-end'>
-                                                    <button type="submit" className='btn btn-warning px-5 text-white rounded-2 col-md-3' style={{ backgroundColor: colors.secondary }}>Post review</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-
-
-
-                                    
-                                </div> 
-                            )}
-
-
-                           {
-                               activeTab === 'questions' && (
-                                <div className='Quetions'>
-                                <div className=''>
-                                    <h2 className='fw-bold fs-1'>What tourists ask about the tour ?</h2>
-                                </div>
-                                <div className='row'>
-                                    <div className='card  col-md-11'>
-                                        <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer hotel transfers?</h3>
-                                        <p className='fw-bold w-75 mt-2 text-black-50'>Hotel transfers are included in the price of this tour, however you can set your hotel location in advance. In this case a tour operator representative will be at the hotel to pickup you you. All you need to do is just to set the hotel location in the checkout page which we’ll ask you to put your location.</p>
-                                    </div>
-                                    <div className='card col-md-11'>
-                                        <h3 className='fw-bold'><i class="bi bi-chat-left me-3 text-black-50"></i>Do you offer accessiblity staffs.</h3>
-                                    </div>
-                                </div>
-                                <div className='col-md-6' style={{borderTop:"1px solid rgba(0,0,0,0.1)"}}>
-                                    <h2 className='fw-bold fs-1 pt-3'>Cancellation policy</h2>
-                                </div>                                
-                                <div>
-                                    <p className='text-black-50'>You can cancel up to 24 hours in advance of the experience for a full refund.</p>
-                                    <ul>
-                                        <li className='text-black-50'>For a full refund, you must cancel at least 24 hours before the experience’s start time.</li>
-                                        <li className='text-black-50'>If you cancel less than 24 hours before the experience’s start time, the amount you paid will not be refunded.</li>
-                                        <li className='text-black-50'>Any changes made less than 24 hours before the experience’s start time will not be accepted.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                               )
-                           }
+                                    )
+                                }
 
 
                             </div>
@@ -801,73 +801,73 @@ export default function ToursDetailsandBooking() {
 
 
 
-                    <div className='related-tour'>
-                        <h2 className='fw-bold fs-1 text-center col-md-12 mt-4 mb-4'>
-                            Related Tours
-                        </h2>
+                <div className='related-tour'>
+                    <h2 className='fw-bold fs-1 text-center col-md-12 mt-4 mb-4'>
+                        Related Tours
+                    </h2>
 
-                        <div className='row'>
-    {relatedTour.length > 0 ? (
-        relatedTour.slice(0, visibleTours).map((tour, index) => (
-            <div className='col-md-4 d-flex justify-content-center' key={index}>
-                <div className="card p-0 w-75">
-                    <div className='position-relative'>
-                        <img src={tour.mainImage} className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
-                        <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
-                        {tour.Featured && (
-                            <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
-                        )}
-                        {tour.disscount && (
-                            <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 rounded-2 bg-danger' style={{ top: "5rem", left: "3rem" }}>-80 %</p>
+                    <div className='row'>
+                        {relatedTour.length > 0 ? (
+                            relatedTour.slice(0, visibleTours).map((tour, index) => (
+                                <div className='col-md-4 d-flex justify-content-center' key={index}>
+                                    <div className="card p-0 w-75">
+                                        <div className='position-relative'>
+                                            <img src={tour.mainImage} className="card-img-top img-fluid" alt="..." style={{ height: "300px" }} />
+                                            <i className="bi bi-bookmark fw-lighter fw-bold position-absolute end-0 text-white" style={{ fontSize: '3rem', top: "-13px", right: "15px", cursor: "pointer" }}></i>
+                                            {tour.Featured && (
+                                                <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 text-capitalize rounded-2' style={{ backgroundColor: colors.secondary, top: "2rem", left: "4rem" }}>featured</p>
+                                            )}
+                                            {tour.disscount && (
+                                                <p className='position-absolute translate-middle fw-bold text-white fs-5 px-2 py-1 rounded-2 bg-danger' style={{ top: "5rem", left: "3rem" }}>-80 %</p>
+                                            )}
+                                        </div>
+                                        <div className="card-body">
+                                            <div className='d-flex fs-6'>
+                                                <i className="bi bi-geo-alt me-3"></i>
+                                                <p className='text-capitalize'>{tour.location}</p>
+                                            </div>
+                                            <div className='border-bottom'>
+                                                <div className='fw-bold fs-5'>{tour.description}</div>
+                                                <div className='d-flex m-3 ms-0'>
+                                                    {renderStars(tour.rating)}
+                                                    <div className='text-black-50 ms-3'>({tour.reviews.length} Reviews)</div>
+                                                </div>
+                                            </div>
+                                            <div className='d-flex justify-content-between mt-3'>
+                                                <div className=''>
+                                                    <div className='d-flex flex-row-reverse'>
+                                                        <del className='fw-bold text-black-50 '>{tour.price}</del>
+                                                    </div>
+                                                    <div className='d-flex align-items-center'>
+                                                        <p>From</p>
+                                                        <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{(tour.price - (1 - tour.disscount) * tour.price)} EGY</p>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <p className='text-black-50 m-0'><i className="bi bi-clock"></i> {tour.duration}</p>
+                                                    <p className='text-black-50 m-0'><i className="bi bi-check2"></i> free cancellation</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        ) : (
+                            <div className='col-12 d-flex justify-content-center'>
+                                <p className='fs-5 text-muted'>No related tours found</p>
+                            </div>
                         )}
                     </div>
-                    <div className="card-body">
-                        <div className='d-flex fs-6'>
-                            <i className="bi bi-geo-alt me-3"></i>
-                            <p className='text-capitalize'>{tour.location}</p>
-                        </div>
-                        <div className='border-bottom'>
-                            <div className='fw-bold fs-5'>{tour.description}</div>
-                            <div className='d-flex m-3 ms-0'>
-                                {renderStars(tour.rating)}
-                                <div className='text-black-50 ms-3'>({tour.reviews.length} Reviews)</div>
-                            </div>
-                        </div>
-                        <div className='d-flex justify-content-between mt-3'>
-                            <div className=''>
-                                <div className='d-flex flex-row-reverse'>
-                                    <del className='fw-bold text-black-50 '>{tour.price}</del>
-                                </div>
-                                <div className='d-flex align-items-center'>
-                                    <p>From</p>
-                                    <p className='ms-3 fw-bold fs-4 mb-0' style={{ color: colors.secondary }}>{(tour.price - (1 - tour.disscount) * tour.price)} EGY</p>
-                                </div>
-                            </div>
+                    {relatedTour.length > visibleTours && (
+                        <div className='d-flex justify-content-end'>
                             <div>
-                                <p className='text-black-50 m-0'><i className="bi bi-clock"></i> {tour.duration}</p>
-                                <p className='text-black-50 m-0'><i className="bi bi-check2"></i> free cancellation</p>
+                                <p className='fs-5 pe-5' style={{ color: colors.secondary, cursor: "pointer" }} onClick={handleShowMoreClick}>Show More</p>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        ))
-    ) : (
-        <div className='col-12 d-flex justify-content-center'>
-            <p className='fs-5 text-muted'>No related tours found</p>
-        </div>
-    )}
-</div>
-{relatedTour.length > visibleTours && (
-    <div className='d-flex justify-content-end'>
-        <div>
-            <p className='fs-5 pe-5' style={{ color: colors.secondary, cursor: "pointer" }} onClick={handleShowMoreClick}>Show More</p>
-        </div>
-    </div>
-)}
+                    )}
 
-                        
-                    </div>
+                    {/* format code */}
+                </div>
             </div>
             <Footer></Footer>
         </>

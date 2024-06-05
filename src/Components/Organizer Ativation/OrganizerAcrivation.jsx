@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react'
 export default function OrganizerAcrivation() {
     const [ orgnaizers , setOrganizers ] = useState([])
     useEffect(()=>{
-        axios.get('http://localhost:2000/organizers/organizers')
+        axios.get('https://tours-api-7hh1.onrender.com/organizers/organizers')
         .then(response =>{
             console.log(response.data)
             setOrganizers(response.data)
@@ -16,7 +16,7 @@ export default function OrganizerAcrivation() {
     },[])
 
     const ActivationToggle = (id , status) => {
-        axios.patch(`http://localhost:2000/organizers/organizers/toggle-activation/${id}`)
+        axios.patch(`https://tours-api-7hh1.onrender.com/organizers/organizers/toggle-activation/${id}`)
         .then(response=>{
             setOrganizers(orgnaizers.map((organizer)=>
                organizer._id === id ? { ...organizer , active : !status } : organizer 

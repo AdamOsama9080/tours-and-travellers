@@ -46,7 +46,7 @@ export default function Discounts() {
             discountStartDate: new Date(formData.discountStartDate).toISOString(),
             discountEndDate: new Date(formData.discountEndDate).toISOString()
         };
-        axios.post('http://localhost:2000/tours/discount-tours', payload)
+        axios.post('https://tours-api-7hh1.onrender.com/tours/discount-tours', payload)
             .then(response => {
                 if (response.data.success) {
                     setSuccess(true);

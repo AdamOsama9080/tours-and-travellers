@@ -30,7 +30,7 @@ export default function BookingVisa() {
 
     useEffect(() => {
         if (location.state && location.state.tourId) {
-            axios.get(`http://localhost:2000/tours/tour/${location.state.tourId}`)
+            axios.get(`https://tours-api-7hh1.onrender.com/tours/tour/${location.state.tourId}`)
                 .then(response => {
                     setNumberOfTravelers(location.state.numberOfTravelers);
                     setTourInfo(response.data.data);
@@ -46,7 +46,7 @@ export default function BookingVisa() {
     };
 
     const handleBooking = () => {
-        axios.post(`http://localhost:2000/booking`, {
+        axios.post(`https://tours-api-7hh1.onrender.com/booking`, {
             user: userId,
             tour: location.state.tourId,
             travelers: travelerData,
@@ -84,7 +84,7 @@ export default function BookingVisa() {
     };
 
     const getOffer = () => {
-        axios.post('http://localhost:2000/coupon/validate-coupon', { code: coupon, email: userEmail })
+        axios.post('https://tours-api-7hh1.onrender.com/coupon/validate-coupon', { code: coupon, email: userEmail })
             .then(response => {
                 if (response) {
                     setDiscount(response.data.discount);

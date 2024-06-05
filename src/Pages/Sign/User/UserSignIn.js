@@ -323,7 +323,7 @@ export default function UserSignIn() {
                 console.log(decodedUser.birthday);
 
                 axios
-                  .post("http://localhost:2000/auth/signinOrSignupWithGoogle", {
+                  .post("https://tours-api-7hh1.onrender.com/auth/signinOrSignupWithGoogle", {
                     firstName: decodedUser.given_name,
                     lastName: decodedUser.family_name,
                     email: decodedUser.email,

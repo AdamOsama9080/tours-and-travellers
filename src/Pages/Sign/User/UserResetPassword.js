@@ -48,7 +48,7 @@ export default function UserResetPassword() {
       const email = new URLSearchParams(window.location.search).get("email");
 
       const response = await axios.post(
-        "http://localhost:2000/auth/reset-password",
+        "https://tours-api-7hh1.onrender.com/auth/reset-password",
         { email, newPassword: password }
       );
 

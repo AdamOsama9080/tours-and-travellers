@@ -38,7 +38,7 @@ export default function UserSignUp() {
     try {
       await validationSchema.validate(formData, { abortEarly: false });
   
-      const response = await axios.post("http://localhost:2000/register/Signup", {
+      const response = await axios.post("https://tours-api-7hh1.onrender.com/register/Signup", {
         firstName: formData.firstname,
         lastName: formData.lastname,
         email: formData.email,
@@ -366,7 +366,7 @@ export default function UserSignUp() {
 
                 axios
                   .post(
-                    "http://localhost:2000/auth/signinOrSignupWithGoogle",
+                    "https://tours-api-7hh1.onrender.com/auth/signinOrSignupWithGoogle",
                     {
                       firstName: decodedUser.given_name,
                       lastName: decodedUser.family_name,

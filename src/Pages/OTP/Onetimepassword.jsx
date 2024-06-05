@@ -88,7 +88,7 @@ const OneTimePassword = () => {
     setVerificationCode(code);
     
     try {
-      const response = await axios.post('http://localhost:2000/register/verify-otp', {
+      const response = await axios.post('https://tours-api-7hh1.onrender.com/register/verify-otp', {
         email,
         otpCode: code,
       });

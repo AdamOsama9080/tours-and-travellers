@@ -9,7 +9,7 @@ export default function OrganizerCustomService() {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.post('http://localhost:2000/customservice/details', { input });
+      const response = await axios.post('https://tours-api-7hh1.onrender.com/customservice/details', { input });
       console.log('Response:', response.data);
       console.log('User Data:', response.data.user);
       console.log('Booking Data:', response.data.bookings);

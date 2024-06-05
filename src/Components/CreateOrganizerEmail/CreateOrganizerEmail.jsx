@@ -60,7 +60,7 @@ export default function CreateOrganizerEmail() {
         validationSchema: validationSchema,
         onSubmit: (values) => {
             console.log(values)
-            axios.post('http://localhost:2000/organizers/register', values)
+            axios.post('https://tours-api-7hh1.onrender.com/organizers/register', values)
                 .then(response => {
                     if (response.status === 201) {
                         Swal.fire({

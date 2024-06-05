@@ -28,7 +28,7 @@ const Finance = () => {
     if (!isLoading) {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:2000/tours/tours');
+        const response = await axios.get('https://tours-api-7hh1.onrender.com/tours/tours');
         const tourData = response.data.data;
         const sortedTourData = tourData.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
         const calculatedDataPoints = calculateProfits(sortedTourData);

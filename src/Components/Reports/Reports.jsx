@@ -72,7 +72,7 @@ export default function Reports() {
         if (selectedExcelOptions.coupons) selectedCollections.push('coupons');
         if (selectedExcelOptions.contacts) selectedCollections.push('contacts');
 
-        axios.post('http://localhost:2000/report/generate-report', { collections: selectedCollections }, {
+        axios.post('https://tours-api-7hh1.onrender.com/report/generate-report', { collections: selectedCollections }, {
             responseType: 'blob' 
         })
         .then((response) => {

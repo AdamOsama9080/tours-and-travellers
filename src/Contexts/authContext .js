@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post("http://localhost:2000/auth/login", {
+      const response = await axios.post("https://tours-api-7hh1.onrender.com/auth/login", {
         email,
         password,
       });

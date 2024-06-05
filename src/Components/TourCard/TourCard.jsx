@@ -15,7 +15,7 @@ export default function TourCard({ tourData }) {
     
     useEffect(() => {
         axios
-          .get(`http://localhost:2000/favourits/get-favourits/${user.id}`)
+          .get(`https://tours-api-7hh1.onrender.com/favourits/get-favourits/${user.id}`)
           .then((response) => {
             const favoriteTours = response.data.map(favorite => favorite.tour._id);
             console.log(favoriteTours);
@@ -30,8 +30,8 @@ export default function TourCard({ tourData }) {
         try {
             const isSaved = savedTours.includes(id); 
             const url = isSaved 
-                ? `http://localhost:2000/favourits/remove-favourit` 
-                : `http://localhost:2000/favourits/add-favourit`;
+                ? `https://tours-api-7hh1.onrender.com/favourits/remove-favourit` 
+                : `https://tours-api-7hh1.onrender.com/favourits/add-favourit`;
 
             const response = await axios.post(url, {
                 userId: user.id,

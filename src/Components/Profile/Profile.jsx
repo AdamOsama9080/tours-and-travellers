@@ -22,7 +22,7 @@ const Profile = () => {
     const fetchProfilePicture = async () => {
       if (user && user.email) {
         try {
-          const response = await axios.post('http://localhost:2000/register/profile', {
+          const response = await axios.post('https://tours-api-7hh1.onrender.com/register/profile', {
             email: user.email,
           }, {
             responseType: 'arraybuffer' // This is important for handling binary data
@@ -100,7 +100,7 @@ const Profile = () => {
   //     console.log(updatedUserData.profilePicture);
   //     console.log(updatedUserData);
   
-  //     const response = await axios.post('http://localhost:2000/register/update-profile', updatedUserData);
+  //     const response = await axios.post('https://tours-api-7hh1.onrender.com/register/update-profile', updatedUserData);
   //     console.log(response.data);
   
   //     if (response.status === 200) {
@@ -136,7 +136,7 @@ const Profile = () => {
       
       console.log(formData);
   
-      const response = await axios.post('http://localhost:2000/register/update-profile', formData);
+      const response = await axios.post('https://tours-api-7hh1.onrender.com/register/update-profile', formData);
       console.log(response.data);
   
       if (response.status === 200) {

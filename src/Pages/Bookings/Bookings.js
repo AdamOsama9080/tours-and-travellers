@@ -30,7 +30,7 @@ export default function Bookings() {
   useEffect(() => {
     console.log("ahhhhh");
     axios
-      .get(`http://localhost:2000/booking/${user.id}`)
+      .get(`https://tours-api-7hh1.onrender.com/booking/${user.id}`)
       .then((response) => {
         setCardContent(response.data.data || []);
         console.log(response.data);
@@ -42,7 +42,7 @@ export default function Bookings() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:2000/favourits/get-favourits/${user.id}`)
+      .get(`https://tours-api-7hh1.onrender.com/favourits/get-favourits/${user.id}`)
       .then((response) => {
         const favoriteTours = response.data.map(favorite => favorite.tour._id);
         console.log(favoriteTours);
@@ -74,7 +74,7 @@ export default function Bookings() {
     }).then((result) => {
       if (result.isConfirmed) {
         axios
-          .put(`http://localhost:2000/booking`, {
+          .put(`https://tours-api-7hh1.onrender.com/booking`, {
             tour: id,
             user: user.id,
           })
@@ -105,7 +105,7 @@ export default function Bookings() {
       // If the tour is already saved, remove it from favorites
       if (isSaved) {
         axios
-          .delete(`http://localhost:2000/favourits/remove-favourit`, {
+          .delete(`https://tours-api-7hh1.onrender.com/favourits/remove-favourit`, {
             data: {
               userId: user.id,
               tourId: id,
@@ -131,7 +131,7 @@ export default function Bookings() {
           });
       } else {
         axios
-          .post(`http://localhost:2000/favourits/add-favourit`, {
+          .post(`https://tours-api-7hh1.onrender.com/favourits/add-favourit`, {
             userId: user.id,
             tourId: id,
           })

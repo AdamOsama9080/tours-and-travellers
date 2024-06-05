@@ -28,7 +28,7 @@ export default function ContactUs() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:2000/contact/contact', formData);
+      const response = await axios.post('https://tours-api-7hh1.onrender.com/contact/contact', formData);
       Swal.fire({
         icon: 'success',
         text: response.data.message,

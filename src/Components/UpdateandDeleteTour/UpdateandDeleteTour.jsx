@@ -55,7 +55,7 @@ export default function UpdateandDeleteTour() {
     console.log(included , excluded);
     const handleFindTour = async () => {
         try {
-            const response = await axios.get(`http://localhost:2000/tours/tour/${inputId}`);
+            const response = await axios.get(`https://tours-api-7hh1.onrender.com/tours/tour/${inputId}`);
             if (response.data) {
                 const initialTourData = {
                     ...response.data.data,
@@ -182,7 +182,7 @@ export default function UpdateandDeleteTour() {
 
         if (confirmResult.isConfirmed) {
             try {
-                const response = await axios.delete(`http://localhost:2000/tours/delete-tour/${tourData._id}`);
+                const response = await axios.delete(`https://tours-api-7hh1.onrender.com/tours/delete-tour/${tourData._id}`);
                 if (response.status === 200) {
                     Swal.fire("Tour Deleted!", "", "success");
                     setTourData(null);
@@ -233,7 +233,7 @@ export default function UpdateandDeleteTour() {
     
         if (confirmResult.isConfirmed) {
             try {
-                const response = await axios.put(`http://localhost:2000/tours/update-tour/${tourData._id}`, updatedData);
+                const response = await axios.put(`https://tours-api-7hh1.onrender.com/tours/update-tour/${tourData._id}`, updatedData);
                 if (response.status === 200) {
                     Swal.fire("Updated!", "", "success");
                 } else {

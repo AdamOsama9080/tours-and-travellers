@@ -50,7 +50,7 @@ export default function ToursDetailsandBooking() {
     }
 
     useEffect(() => {
-        axios.get(`http://localhost:2000/tours/tour/${tourId}`)
+        axios.get(`https://tours-api-7hh1.onrender.com/tours/tour/${tourId}`)
             .then(response => {
                 console.log('Response:', response);
                 const tourInfo = response.data.data;
@@ -88,7 +88,7 @@ export default function ToursDetailsandBooking() {
         e.preventDefault();
         console.log('Form Data:', formData);
         try {
-            const response = await axios.post('http://localhost:2000/reviews/review', {
+            const response = await axios.post('https://tours-api-7hh1.onrender.com/reviews/review', {
                 name: formData.name,
                 email: formData.email,
                 guideRating: formData.guideRating,
@@ -132,7 +132,7 @@ export default function ToursDetailsandBooking() {
 
     useEffect(() => {
         if (tourData) {
-            axios.post(`http://localhost:2000/tours/related-tours`, {
+            axios.post(`https://tours-api-7hh1.onrender.com/tours/related-tours`, {
                 location: tourData.location
             }).then(response => {
                 console.log('Response:', response);
@@ -152,7 +152,7 @@ export default function ToursDetailsandBooking() {
         const fetchProfilePicture = async () => {
             if (user && user.email) {
                 try {
-                    const response = await axios.post('http://localhost:2000/register/profile', {
+                    const response = await axios.post('https://tours-api-7hh1.onrender.com/register/profile', {
                         email: user.email,
                     }, {
                         responseType: 'arraybuffer' // This is important for handling binary data
@@ -172,7 +172,7 @@ export default function ToursDetailsandBooking() {
 
     console.log(relatedTour);
     useEffect(() => {
-        axios.get(`http://localhost:2000/reviews/reviews/tour/${tourId}`)
+        axios.get(`https://tours-api-7hh1.onrender.com/reviews/reviews/tour/${tourId}`)
             .then(response => {
                 console.log('Response:=====>', response.data);
                 const tourReviewsData = response.data;
@@ -267,7 +267,7 @@ export default function ToursDetailsandBooking() {
     const handleBookNowClick = () => {
         if (!tourData) return;
 
-        axios.get(`http://localhost:2000/tours/tour/${tourId}`)
+        axios.get(`https://tours-api-7hh1.onrender.com/tours/tour/${tourId}`)
             .then(response => {
                 const tourInfo = response.data.data;
                 const emptyPlaces = tourInfo.emptyPlaces;
@@ -338,7 +338,7 @@ export default function ToursDetailsandBooking() {
 
     const handleDeleteReview = async (reviewId) => {
         try {
-            const response = await axios.delete(`http://localhost:2000/reviews/review`, {
+            const response = await axios.delete(`https://tours-api-7hh1.onrender.com/reviews/review`, {
                 data: {
                     userId: user.id,
                     reviewId: reviewId

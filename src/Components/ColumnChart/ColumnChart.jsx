@@ -19,7 +19,7 @@ export default function ColumnChart() {
   const [dataPoints, setDataPoints] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:2000/tours/tours')
+    axios.get('https://tours-api-7hh1.onrender.com/tours/tours')
       .then(response => {
         setToursData(response.data.data || []);
         console.log('Response:', response.data);
